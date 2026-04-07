@@ -1,0 +1,29 @@
+name: Sync BASE Feed
+on:
+  schedule:
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - run: python base_to_insta_feed.py
+        env:
+          BASE_CLIENT_ID: ${{ secrets.BASE_CLIENT_ID }}
+          BASE_CLIENT_SECRET: ${{ secrets.BASE_CLIENT_SECRET }}
+          BASE_REFRESH_TOKEN: ${{ secrets.BASE_REFRESH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/
+      - id: deploy
+        uses: actions/deploy-pages@v4
