@@ -9,7 +9,7 @@ CLIENT_SECRET = os.environ.get("BASE_CLIENT_SECRET", "").strip()
 REFRESH_TOKEN = os.environ.get("BASE_REFRESH_TOKEN", "").strip()
 ACCESS_TOKEN  = os.environ.get("BASE_ACCESS_TOKEN", "").strip()
 SHOP_ID       = os.environ.get("SHOP_ID", "").strip() or "killstreet2"
-DEBUG         = os.environ.get("DEBUG", "false").lower() == "true"
+DEBUG         = True  # 強制ON（診断用）
 
 
 def get_access_token():
@@ -73,6 +73,13 @@ def get_items(access_token):
     return items
 
 
+def is_public(item):
+    """公開中とみなせる商品かどうか判定（status が selling / published / visible 等）"""
+    status = str(item.get("status", "")).lower()
+    visible = item.get("visible", item.get("is_visible", item.get("published", None)))
+    return status in ("selling", "published", "visible", "active", "1", "true") or visible in (True, 1, "1", "true")
+
+
 def _get_image_url(item):
     imgs = item.get("images", [])
     if imgs:
@@ -88,8 +95,14 @@ def build_feed(items):
     ET.SubElement(channel, "link").text = "https://killstreet.thebase.in"
     ET.SubElement(channel, "description").text = "KILLSTREET product feed"
     for item in items:
-        if item.get("status") != "selling":
+        status = item.get("status", "N/A")
+        visible = item.get("visible", item.get("is_visible", item.get("published", "N/A")))
+        item_id = item.get("item_id", "?")
+        title = item.get("title", "")[:30]
+        if not is_public(item):
+            print(f"[SKIP] id={item_id} title={title!r} status={status} visible={visible}")
             continue
+        print(f"[INFO] feed対象: id={item_id} title={title!r} status={status} visible={visible}")
         entry = ET.SubElement(channel, "item")
         ET.SubElement(entry, "g:id").text = str(item["item_id"])
         ET.SubElement(entry, "g:title").text = item.get("title", "")
@@ -109,14 +122,20 @@ def main():
     print(f"[INFO] SHOP_ID = {SHOP_ID}, DEBUG = {DEBUG}")
     token = get_access_token()
     items = get_items(token)
-    selling = [i for i in items if i.get("status") == "selling"]
-    print(f"[INFO] 全 {len(items)} 件取得, 販売中: {len(selling)} 件")
+    print(f"[INFO] 全 {len(items)} 件取得")
+    for item in items:
+        status = item.get("status", "N/A")
+        visible = item.get("visible", item.get("is_visible", item.get("published", "N/A")))
+        item_id = item.get("item_id", "?")
+        title = item.get("title", "")[:30]
+        print(f"[DEBUG] 商品ステータス: id={item_id} title={title!r} status={status} visible={visible}")
+    feed_items = [i for i in items if is_public(i)]
     feed = build_feed(items)
     os.makedirs("docs", exist_ok=True)
     with open("docs/feed.xml", "w", encoding="utf-8") as f:
         f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
         f.write(feed)
-    print(f"[INFO] feed.xml 生成完了 ({len(selling)} 件)")
+    print(f"[INFO] feed対象: {len(feed_items)}件 / 全{len(items)}件")
 
 
 if __name__ == "__main__":
