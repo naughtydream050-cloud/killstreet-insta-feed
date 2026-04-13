@@ -1,58 +1,67 @@
-﻿import os
+import os
 import sys
 import json
 import time
+import traceback
 import requests
 import xml.etree.ElementTree as ET
 
-# 笏笏 迺ｰ蠅・､画焚 笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
-CLIENT_ID      = os.environ.get("BASE_CLIENT_ID", "").strip()
-CLIENT_SECRET  = os.environ.get("BASE_CLIENT_SECRET", "").strip()
-REFRESH_TOKEN  = os.environ.get("BASE_REFRESH_TOKEN", "").strip()
-ACCESS_TOKEN   = os.environ.get("BASE_ACCESS_TOKEN", "").strip()
-SHOP_ID        = os.environ.get("SHOP_ID", "").strip() or "killstreet2"
-IG_TOKEN       = os.environ.get("INSTAGRAM_TOKEN", "").strip()
-IG_USER_ID     = os.environ.get("IG_USER_ID", "").strip()
-IG_MAX_POSTS   = int(os.environ.get("IG_MAX_POSTS", "1"))   # 1蝗槭・螳溯｡後〒謚慕ｨｿ縺吶ｋ譛螟ｧ莉ｶ謨ｰ
-DEBUG          = True  # 蠑ｷ蛻ｶON・郁ｨｺ譁ｭ逕ｨ・・DRY_RUN        = os.environ.get("DRY_RUN", "false").lower() == "true"
+# ── Environment variables ─────────────────────────────────────────────────────
+CLIENT_ID     = os.environ.get("BASE_CLIENT_ID", "").strip()
+CLIENT_SECRET = os.environ.get("BASE_CLIENT_SECRET", "").strip()
+REFRESH_TOKEN = os.environ.get("BASE_REFRESH_TOKEN", "").strip()
+ACCESS_TOKEN  = os.environ.get("BASE_ACCESS_TOKEN", "").strip()
+SHOP_ID       = os.environ.get("SHOP_ID", "").strip() or "killstreet2"
+IG_TOKEN      = os.environ.get("INSTAGRAM_TOKEN", "").strip()
+IG_USER_ID    = os.environ.get("IG_USER_ID", "").strip()
+IG_MAX_POSTS  = int(os.environ.get("IG_MAX_POSTS", "1"))
+DEBUG         = True   # forced ON for diagnostics
+DRY_RUN       = os.environ.get("DRY_RUN", "false").lower() == "true"
 
 
-# 笏笏 BASE 隱崎ｨｼ 笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+# ── BASE authentication ───────────────────────────────────────────────────────
 def get_base_token():
+    print(f"[AUTH] REFRESH_TOKEN set: {bool(REFRESH_TOKEN)} | CLIENT_ID set: {bool(CLIENT_ID)}")
     if REFRESH_TOKEN and CLIENT_ID and CLIENT_SECRET:
-        print("[AUTH] 繝ｪ繝輔Ξ繝・す繝･繝医・繧ｯ繝ｳ縺ｧ繧｢繧ｯ繧ｻ繧ｹ繝医・繧ｯ繝ｳ繧貞叙蠕嶺ｸｭ...")
-        resp = requests.post("https://api.thebase.in/1/oauth/token", data={
-            "grant_type": "refresh_token",
-            "client_id": CLIENT_ID,
-            "client_secret": CLIENT_SECRET,
-            "refresh_token": REFRESH_TOKEN,
-        })
-        if resp.status_code == 200:
-            data = resp.json()
-            new_rt = data.get("refresh_token", "")
-            if new_rt and new_rt != REFRESH_TOKEN:
-                print("[AUTH] 繝ｪ繝輔Ξ繝・す繝･繝医・繧ｯ繝ｳ繧偵Ο繝ｼ繝・・繧ｷ繝ｧ繝ｳ 竊・Secrets 譖ｴ譁ｰ隧ｦ陦・)
-                ret = os.system(
-                    f'gh secret set BASE_REFRESH_TOKEN '
-                    f'-R naughtydream050-cloud/killstreet-insta-feed '
-                    f'--body "{new_rt}" 2>&1'
-                )
-                if ret != 0:
-                    print("[AUTH] Secrets 閾ｪ蜍墓峩譁ｰ縺ｯ讓ｩ髯蝉ｸ崎ｶｳ縺ｧ繧ｹ繧ｭ繝・・・域焔蜍墓峩譁ｰ繧呈耳螂ｨ・・)
-            print("[AUTH] BASE 繧｢繧ｯ繧ｻ繧ｹ繝医・繧ｯ繝ｳ蜿門ｾ玲・蜉・)
-            return data["access_token"]
-        else:
-            print(f"[AUTH] 繝ｪ繝輔Ξ繝・す繝･螟ｱ謨・ HTTP {resp.status_code} 竊・{resp.text[:300]}")
+        print("[AUTH] Requesting access token via refresh_token...")
+        try:
+            resp = requests.post("https://api.thebase.in/1/oauth/token", data={
+                "grant_type": "refresh_token",
+                "client_id": CLIENT_ID,
+                "client_secret": CLIENT_SECRET,
+                "refresh_token": REFRESH_TOKEN,
+            }, timeout=30)
+            print(f"[AUTH] Token response: HTTP {resp.status_code} | {resp.text[:300]}")
+            if resp.status_code == 200:
+                data = resp.json()
+                new_rt = data.get("refresh_token", "")
+                if new_rt and new_rt != REFRESH_TOKEN:
+                    print("[AUTH] refresh_token rotated -> attempting Secrets update")
+                    ret = os.system(
+                        f'gh secret set BASE_REFRESH_TOKEN '
+                        f'-R naughtydream050-cloud/killstreet-insta-feed '
+                        f'--body "{new_rt}" 2>&1'
+                    )
+                    if ret != 0:
+                        print("[AUTH] WARNING: Secrets auto-update failed (permission denied) - update manually")
+                print("[AUTH] BASE access token obtained successfully")
+                return data["access_token"]
+            else:
+                print(f"[AUTH] Refresh failed: HTTP {resp.status_code} -> {resp.text[:300]}")
+        except Exception as e:
+            print(f"[AUTH ERROR] Exception during token refresh: {e}")
+            traceback.print_exc()
+
     if ACCESS_TOKEN:
-        print("[AUTH] BASE_ACCESS_TOKEN 繧偵ヵ繧ｩ繝ｼ繝ｫ繝舌ャ繧ｯ縺ｨ縺励※菴ｿ逕ｨ")
+        print("[AUTH] Using BASE_ACCESS_TOKEN as fallback")
         return ACCESS_TOKEN
-    print("[AUTH ERROR] BASE_REFRESH_TOKEN 縺ｾ縺溘・ BASE_ACCESS_TOKEN 繧定ｨｭ螳壹＠縺ｦ縺上□縺輔＞縲・)
+
+    print("[AUTH ERROR] Neither BASE_REFRESH_TOKEN nor BASE_ACCESS_TOKEN is set.")
     sys.exit(1)
 
 
-# 笏笏 BASE 蝠・刀蜿門ｾ・笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+# ── BASE item helpers ─────────────────────────────────────────────────────────
 def is_public(item):
-    """visible: 1 縺ｾ縺溘・ selling 繧ｹ繝・・繧ｿ繧ｹ縺ｮ蝠・刀繧貞・髢九→縺ｿ縺ｪ縺・""
     visible = item.get("visible", item.get("is_visible", None))
     if visible in (True, 1, "1", "true"):
         return True
@@ -65,49 +74,64 @@ def _get_image_url(item):
     if imgs:
         img = imgs[0]
         if DEBUG:
-            print(f"[IMG DEBUG] keys={list(img.keys())} sample={json.dumps(img, ensure_ascii=False)[:200]}")
-        # BASE API returns "original" (not "origin") as the full-size image key
-        return (img.get("original") or img.get("origin") or
-                img.get("url") or img.get("large") or "")
-    return (item.get("list_image_url") or item.get("detail_image_url") or "")
+            print(f"[IMG DEBUG] id={item.get('item_id')} image keys={list(img.keys())} | raw={json.dumps(img, ensure_ascii=False)[:300]}")
+        # BASE API uses "original" as the full-size image key
+        url = (img.get("original") or img.get("origin") or
+               img.get("url") or img.get("large") or "")
+        print(f"[IMG] id={item.get('item_id')} -> image_url={url[:80] if url else '(empty)'}")
+        return url
+    fallback = item.get("list_image_url") or item.get("detail_image_url") or ""
+    print(f"[IMG] id={item.get('item_id')} -> no images array, fallback={fallback[:80] if fallback else '(empty)'}")
+    return fallback
 
 
+# ── BASE item fetching ────────────────────────────────────────────────────────
 def fetch_items(base_token):
     headers = {"Authorization": f"Bearer {base_token}"}
     items, limit, offset = [], 100, 0
+    print("[INFO] Fetching items from BASE API...")
     while True:
         params = {"limit": limit, "offset": offset, "order": "new"}
-        r = requests.get("https://api.thebase.in/1/items", headers=headers, params=params)
+        try:
+            r = requests.get("https://api.thebase.in/1/items", headers=headers, params=params, timeout=30)
+        except Exception as e:
+            print(f"[ERROR] Request exception: {e}")
+            traceback.print_exc()
+            sys.exit(1)
+
+        print(f"[INFO] BASE API response: HTTP {r.status_code} | offset={offset}")
         if r.status_code == 401:
-            print("[ERROR] 401 Unauthorized: 繝医・繧ｯ繝ｳ縺悟､ｱ蜉ｹ縺励※縺・∪縺吶・)
+            print("[ERROR] 401 Unauthorized: token has expired.")
             sys.exit(1)
         if r.status_code == 403:
-            print("[ERROR] 403 Forbidden: read_items 繧ｹ繧ｳ繝ｼ繝励′荳崎ｶｳ縺励※縺・∪縺吶・)
+            print("[ERROR] 403 Forbidden: missing read_items scope.")
             sys.exit(1)
         r.raise_for_status()
         data = r.json()
         if "items" not in data:
-            print(f"[ERROR] items 繧ｭ繝ｼ縺後≠繧翫∪縺帙ｓ: {json.dumps(data)[:500]}")
+            print(f"[ERROR] 'items' key not found in response: {json.dumps(data)[:500]}")
             sys.exit(1)
         batch = data["items"]
         if offset == 0 and batch:
-            print(f"[INFO] 繝輔ぅ繝ｼ繝ｫ繝我ｸ隕ｧ: {list(batch[0].keys())}")
+            print(f"[INFO] Field names: {list(batch[0].keys())}")
         if DEBUG and batch:
-            print(f"[DEBUG] offset={offset} response: {json.dumps(data, ensure_ascii=False)[:2000]}")
+            print(f"[DEBUG] First item raw: {json.dumps(batch[0], ensure_ascii=False)[:1000]}")
         items.extend(batch)
         if len(batch) < limit:
             break
         offset += limit
 
-    print(f"[INFO] 蜈ｨ {len(items)} 莉ｶ蜿門ｾ・)
+    print(f"[INFO] Total {len(items)} items fetched")
     for it in items:
         v = it.get("visible", it.get("is_visible", "N/A"))
         s = it.get("status", "N/A")
-        print(f"  id={it.get('item_id')} status={s!r} visible={v!r} title={str(it.get('title',''))[:25]!r}")
+        title = str(it.get("title", ""))[:30]
+        pub = is_public(it)
+        print(f"  id={it.get('item_id')} status={s!r} visible={v!r} public={pub} title={title!r}")
     return items
 
 
-# 笏笏 feed.xml 逕滓・ 笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+# ── feed.xml generation ───────────────────────────────────────────────────────
 def build_feed(items):
     rss = ET.Element("rss", version="2.0")
     rss.set("xmlns:g", "http://base.google.com/ns/1.0")
@@ -132,92 +156,128 @@ def build_feed(items):
         stock = item.get("stock", 0)
         ET.SubElement(e, "g:availability").text = "in stock" if stock > 0 else "out of stock"
         ET.SubElement(e, "g:condition").text = "new"
-    print(f"[INFO] feed.xml 蟇ｾ雎｡: {count} 莉ｶ")
+    print(f"[INFO] feed.xml: {count} public items")
     return ET.tostring(rss, encoding="unicode", xml_declaration=False)
 
 
-# 笏笏 Instagram 謚慕ｨｿ 笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+# ── Instagram posting ─────────────────────────────────────────────────────────
 def ig_post(item):
-    """Instagram Graph API 縺ｧ逕ｻ蜒上ｒ謚慕ｨｿ縺吶ｋ・・繧ｹ繝・ャ繝暦ｼ・""
+    print(f"\n[IG] ===== Starting post for item id={item.get('item_id')} =====")
+
     img_url = _get_image_url(item)
     if not img_url:
-        print(f"[IG SKIP] id={item.get('item_id')} 窶・逕ｻ蜒酋RL縺ｪ縺・)
+        print(f"[IG SKIP] id={item.get('item_id')} - no image URL found")
         return False
 
-    title   = item.get("title", "")
-    price   = item.get("price", 0)
+    title    = item.get("title", "")
+    price    = item.get("price", 0)
     item_url = item.get("item_url", "")
-    caption = f"{title}\n\nﾂ･{price:,}\n\n{item_url}\n\n#killstreet #streetwear"
+    caption  = f"{title}\n\n\u00a5{price:,}\n\n{item_url}\n\n#killstreet #streetwear"
 
-    print(f"[IG] 謚慕ｨｿ髢句ｧ・ id={item.get('item_id')} title={title[:30]!r}")
+    print(f"[IG] title={title[:40]!r}")
     print(f"[IG] image_url={img_url}")
+    print(f"[IG] caption preview: {caption[:80]!r}")
+    print(f"[IG] DRY_RUN={DRY_RUN} | IG_USER_ID={IG_USER_ID[:6]}... | IG_TOKEN set={bool(IG_TOKEN)}")
 
     if DRY_RUN:
-        print(f"[DRY RUN] 謚慕ｨｿ繧偵せ繧ｭ繝・・・・aption={caption[:60]}...・・)
+        print(f"[DRY RUN] Skipping actual post (dry run mode)")
         return True
 
-    # 繧ｹ繝・ャ繝・: 繝｡繝・ぅ繧｢繧ｳ繝ｳ繝・リ菴懈・
-    create_url = f"https://graph.facebook.com/v19.0/{IG_USER_ID}/media"
-    resp1 = requests.post(create_url, data={
-        "image_url": img_url,
-        "caption": caption,
-        "access_token": IG_TOKEN,
-    })
-    if resp1.status_code != 200:
-        print(f"[IG ERROR] 繝｡繝・ぅ繧｢菴懈・螟ｱ謨・ HTTP {resp1.status_code} 竊・{resp1.text[:500]}")
+    # Step 1: Create media container
+    print("[IG] Step 1: Creating media container...")
+    try:
+        create_url = f"https://graph.facebook.com/v19.0/{IG_USER_ID}/media"
+        resp1 = requests.post(create_url, data={
+            "image_url": img_url,
+            "caption": caption,
+            "access_token": IG_TOKEN,
+        }, timeout=60)
+        print(f"[IG] Step 1 response: HTTP {resp1.status_code}")
+        print(f"[IG] Step 1 body: {resp1.text[:1000]}")
+    except Exception as e:
+        print(f"[IG ERROR] Exception in Step 1: {e}")
+        traceback.print_exc()
         return False
+
+    if resp1.status_code != 200:
+        print(f"[IG ERROR] Media container creation failed: HTTP {resp1.status_code} -> {resp1.text[:500]}")
+        return False
+
     creation_id = resp1.json().get("id")
     if not creation_id:
-        print(f"[IG ERROR] creation_id 縺悟叙蠕励〒縺阪∪縺帙ｓ: {resp1.text[:300]}")
+        print(f"[IG ERROR] creation_id missing from response: {resp1.text[:300]}")
         return False
     print(f"[IG] creation_id = {creation_id}")
 
-    # 繧ｹ繝・ャ繝・: 蜈ｬ髢・    time.sleep(2)  # API 繝ｬ繝ｼ繝亥宛髯仙ｯｾ遲・    publish_url = f"https://graph.facebook.com/v19.0/{IG_USER_ID}/media_publish"
-    resp2 = requests.post(publish_url, data={
-        "creation_id": creation_id,
-        "access_token": IG_TOKEN,
-    })
+    # Step 2: Publish
+    print("[IG] Waiting 5s before publish...")
+    time.sleep(5)
+    print("[IG] Step 2: Publishing media...")
+    try:
+        publish_url = f"https://graph.facebook.com/v19.0/{IG_USER_ID}/media_publish"
+        resp2 = requests.post(publish_url, data={
+            "creation_id": creation_id,
+            "access_token": IG_TOKEN,
+        }, timeout=60)
+        print(f"[IG] Step 2 response: HTTP {resp2.status_code}")
+        print(f"[IG] Step 2 body: {resp2.text[:1000]}")
+    except Exception as e:
+        print(f"[IG ERROR] Exception in Step 2: {e}")
+        traceback.print_exc()
+        return False
+
     if resp2.status_code != 200:
-        print(f"[IG ERROR] 蜈ｬ髢句､ｱ謨・ HTTP {resp2.status_code} 竊・{resp2.text[:500]}")
+        print(f"[IG ERROR] Publish failed: HTTP {resp2.status_code} -> {resp2.text[:500]}")
         return False
 
     post_id = resp2.json().get("id", "unknown")
-    print(f"[IG] 笨・謚慕ｨｿ謌仙粥! post_id={post_id}")
+    print(f"[IG] SUCCESS! post_id={post_id}")
     return True
 
 
-# 笏笏 繝｡繧､繝ｳ 笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏笏
+# ── Main ──────────────────────────────────────────────────────────────────────
 def main():
-    print(f"[INFO] SHOP_ID={SHOP_ID} | DRY_RUN={DRY_RUN} | IG_MAX_POSTS={IG_MAX_POSTS}")
+    print(f"[INFO] === KILLSTREET Instagram Auto-Post ===")
+    print(f"[INFO] SHOP_ID={SHOP_ID} | DRY_RUN={DRY_RUN} | IG_MAX_POSTS={IG_MAX_POSTS} | DEBUG={DEBUG}")
+    print(f"[INFO] IG_TOKEN set={bool(IG_TOKEN)} | IG_USER_ID set={bool(IG_USER_ID)}")
 
-    # BASE 蝠・刀蜿門ｾ・    base_token = get_base_token()
+    # Fetch BASE items
+    base_token = get_base_token()
     all_items  = fetch_items(base_token)
 
-    # feed.xml 逕滓・ & 菫晏ｭ・    feed = build_feed(all_items)
+    # Generate and save feed.xml
+    feed = build_feed(all_items)
     os.makedirs("docs", exist_ok=True)
     with open("docs/feed.xml", "w", encoding="utf-8") as f:
         f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
         f.write(feed)
-    print("[INFO] feed.xml 逕滓・螳御ｺ・)
+    print("[INFO] feed.xml saved")
 
-    # Instagram 謚慕ｨｿ
+    # Instagram posting
     if not IG_TOKEN or not IG_USER_ID:
-        print("[IG] INSTAGRAM_TOKEN 縺ｾ縺溘・ IG_USER_ID 縺梧悴險ｭ螳壹・縺溘ａ繧ｹ繧ｭ繝・・")
+        print("[IG] INSTAGRAM_TOKEN or IG_USER_ID not set - skipping Instagram post")
         return
 
     public_items = [i for i in all_items if is_public(i)]
-    print(f"[IG] 蜈ｬ髢句膚蜩・{len(public_items)} 莉ｶ 竊・譛螟ｧ {IG_MAX_POSTS} 莉ｶ謚慕ｨｿ")
+    print(f"[IG] {len(public_items)} public items found -> posting up to {IG_MAX_POSTS}")
+
+    if not public_items:
+        print("[IG] No public items available to post")
+        return
 
     posted = 0
     for item in public_items[:IG_MAX_POSTS]:
-        ok = ig_post(item)
-        if ok:
-            posted += 1
-        time.sleep(3)  # 騾｣邯壽兜遞ｿ繧､繝ｳ繧ｿ繝ｼ繝舌Ν
+        try:
+            ok = ig_post(item)
+            if ok:
+                posted += 1
+        except Exception as e:
+            print(f"[IG ERROR] Unhandled exception for item {item.get('item_id')}: {e}")
+            traceback.print_exc()
+        time.sleep(3)
 
-    print(f"[IG] 謚慕ｨｿ螳御ｺ・ {posted}/{min(len(public_items), IG_MAX_POSTS)} 莉ｶ")
+    print(f"\n[IG] Done: {posted}/{min(len(public_items), IG_MAX_POSTS)} posted")
 
 
 if __name__ == "__main__":
     main()
-
