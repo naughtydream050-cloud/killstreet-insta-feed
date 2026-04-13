@@ -64,8 +64,13 @@ def is_public(item):
 def _get_image_url(item):
     imgs = item.get("images", [])
     if imgs:
-        return imgs[0].get("origin", imgs[0].get("url", ""))
-    return item.get("list_image_url", item.get("detail_image_url", ""))
+        img = imgs[0]
+        if DEBUG:
+            print(f"[IMG DEBUG] keys={list(img.keys())} sample={json.dumps(img, ensure_ascii=False)[:200]}")
+        # BASE API returns "original" (not "origin") as the full-size image key
+        return (img.get("original") or img.get("origin") or
+                img.get("url") or img.get("large") or "")
+    return (item.get("list_image_url") or item.get("detail_image_url") or "")
 
 
 def fetch_items(base_token):
@@ -220,3 +225,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+                   
