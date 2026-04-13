@@ -70,18 +70,36 @@ def is_public(item):
 
 
 def _get_image_url(item):
+    item_id = item.get("item_id")
+
+    # Pattern 1: nested images array (standard)
     imgs = item.get("images", [])
     if imgs:
         img = imgs[0]
         if DEBUG:
-            print(f"[IMG DEBUG] id={item.get('item_id')} image keys={list(img.keys())} | raw={json.dumps(img, ensure_ascii=False)[:300]}")
-        # BASE API uses "original" as the full-size image key
+            print(f"[IMG DEBUG] id={item_id} image keys={list(img.keys())} | raw={json.dumps(img, ensure_ascii=False)[:300]}")
         url = (img.get("original") or img.get("origin") or
                img.get("url") or img.get("large") or "")
-        print(f"[IMG] id={item.get('item_id')} -> image_url={url[:80] if url else '(empty)'}")
-        return url
-    fallback = item.get("list_image_url") or item.get("detail_image_url") or ""
-    print(f"[IMG] id={item.get('item_id')} -> no images array, fallback={fallback[:80] if fallback else '(empty)'}")
+        if url:
+            print(f"[IMG] id={item_id} -> {url[:80]}")
+            return url
+
+    # Pattern 2: flat fields  img1_origin, img1_url, img1_thumb_url, etc.
+    for suffix in ("origin", "url", "thumb_url"):
+        for prefix in ("img1", "image1", "img"):
+            key = f"{prefix}_{suffix}"
+            val = item.get(key, "")
+            if val:
+                print(f"[IMG] id={item_id} -> found via key '{key}': {val[:80]}")
+                return val
+
+    # Pattern 3: legacy flat keys
+    fallback = (item.get("list_image_url") or item.get("detail_image_url") or
+                item.get("image_url") or "")
+    if fallback:
+        print(f"[IMG] id={item_id} -> fallback key: {fallback[:80]}")
+    else:
+        print(f"[IMG] id={item_id} -> no image URL found. Available keys: {[k for k in item.keys() if 'img' in k.lower() or 'image' in k.lower()]}")
     return fallback
 
 
