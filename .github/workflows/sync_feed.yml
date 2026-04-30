@@ -2,19 +2,19 @@ name: Sync BASE Feed
 
 on:
   schedule:
-    - cron: '0 13 * * 0'   # Every Sunday 22:00 JST
+    - cron: '0 13 * * 0'   # 毎週日曜 22:00 JST
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'DRY_RUN (no actual post)'
+        description: 'DRY_RUN (投稿しない確認実行)'
         required: false
         default: 'false'
       ig_max_posts:
-        description: 'Max posts (default: 1)'
+        description: '最大投稿件数 (default: 1)'
         required: false
         default: '1'
       debug:
-        description: 'DEBUG mode'
+        description: 'DEBUG モード'
         required: false
         default: 'false'
 
@@ -33,7 +33,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - run: pip install requests
+      - run: pip install requests PyNaCl
 
       - name: Run sync script
         run: python base_to_insta_feed.py
@@ -45,7 +45,7 @@ jobs:
           INSTAGRAM_TOKEN:    ${{ secrets.INSTAGRAM_TOKEN }}
           IG_USER_ID:         ${{ secrets.IG_USER_ID }}
           SHOP_ID:            ${{ secrets.SHOP_ID }}
-          GH_TOKEN:           ${{ secrets.GITHUB_TOKEN }}
+          GH_PAT_SECRETS:     ${{ secrets.GH_PAT_SECRETS }}
           DRY_RUN:            ${{ github.event.inputs.dry_run || 'false' }}
           IG_MAX_POSTS:       ${{ github.event.inputs.ig_max_posts || '1' }}
           DEBUG:              ${{ github.event.inputs.debug || 'false' }}
