@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import time
+import base64
 import traceback
 import requests
 import xml.etree.ElementTree as ET
@@ -14,9 +15,82 @@ ACCESS_TOKEN  = os.environ.get("BASE_ACCESS_TOKEN", "").strip()
 SHOP_ID       = os.environ.get("SHOP_ID", "").strip() or "killstreet2"
 IG_TOKEN      = os.environ.get("INSTAGRAM_TOKEN", "").strip()
 IG_USER_ID    = os.environ.get("IG_USER_ID", "").strip()
-IG_MAX_POSTS  = int(os.environ.get("IG_MAX_POSTS", "1"))
-DEBUG         = True   # forced ON for diagnostics
-DRY_RUN       = os.environ.get("DRY_RUN", "false").lower() == "true"
+IG_MAX_POSTS      = int(os.environ.get("IG_MAX_POSTS", "1"))
+DEBUG             = True   # forced ON for diagnostics
+DRY_RUN           = os.environ.get("DRY_RUN", "false").lower() == "true"
+GH_PAT_SECRETS    = os.environ.get("GH_PAT_SECRETS", "").strip()
+GH_REPO           = "naughtydream050-cloud/killstreet-insta-feed"
+
+
+# ── GitHub Secret auto-updater (PyNaCl + REST API) ───────────────────────────
+def update_github_secret(secret_name, secret_value):
+    """
+    GitHub REST API + PyNaCl を使って Actions Secret を自動更新する。
+    GH_PAT_SECRETS に secrets:write スコープの fine-grained PAT が必要。
+    """
+    if not GH_PAT_SECRETS:
+        print(f"[SECRET] GH_PAT_SECRETS not set -> cannot auto-rotate {secret_name}")
+        return False
+
+    try:
+        from nacl import public as nacl_public
+    except ImportError:
+        print("[SECRET] PyNaCl not installed -> skipping secret update")
+        return False
+
+    headers = {
+        "Authorization": f"Bearer {GH_PAT_SECRETS}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+
+    # Step 1: リポジトリの公開鍵を取得（暗号化に必要）
+    try:
+        key_resp = requests.get(
+            f"https://api.github.com/repos/{GH_REPO}/actions/secrets/public-key",
+            headers=headers, timeout=30
+        )
+        print(f"[SECRET] Public key fetch: HTTP {key_resp.status_code}")
+        if key_resp.status_code != 200:
+            print(f"[SECRET] Public key error: {key_resp.text[:300]}")
+            return False
+        key_data = key_resp.json()
+        key_id = key_data["key_id"]
+        pub_key_bytes = base64.b64decode(key_data["key"])
+    except Exception as e:
+        print(f"[SECRET] Exception fetching public key: {e}")
+        traceback.print_exc()
+        return False
+
+    # Step 2: libsodium SealedBox で暗号化
+    try:
+        sealed_box = nacl_public.SealedBox(nacl_public.PublicKey(pub_key_bytes))
+        encrypted = sealed_box.encrypt(secret_value.encode("utf-8"))
+        encrypted_b64 = base64.b64encode(encrypted).decode("utf-8")
+    except Exception as e:
+        print(f"[SECRET] Encryption failed: {e}")
+        traceback.print_exc()
+        return False
+
+    # Step 3: PUT で Secret を上書き
+    try:
+        put_resp = requests.put(
+            f"https://api.github.com/repos/{GH_REPO}/actions/secrets/{secret_name}",
+            headers=headers,
+            json={"encrypted_value": encrypted_b64, "key_id": key_id},
+            timeout=30
+        )
+        print(f"[SECRET] PUT {secret_name}: HTTP {put_resp.status_code}")
+        if put_resp.status_code in (201, 204):
+            print(f"[SECRET] ✅ {secret_name} auto-rotated successfully via GitHub API")
+            return True
+        else:
+            print(f"[SECRET] ❌ PUT failed: {put_resp.text[:300]}")
+            return False
+    except Exception as e:
+        print(f"[SECRET] Exception updating secret: {e}")
+        traceback.print_exc()
+        return False
 
 
 # ── BASE authentication ───────────────────────────────────────────────────────
@@ -36,14 +110,9 @@ def get_base_token():
                 data = resp.json()
                 new_rt = data.get("refresh_token", "")
                 if new_rt and new_rt != REFRESH_TOKEN:
-                    print("[AUTH] refresh_token rotated -> attempting Secrets update")
-                    ret = os.system(
-                        f'gh secret set BASE_REFRESH_TOKEN '
-                        f'-R naughtydream050-cloud/killstreet-insta-feed '
-                        f'--body "{new_rt}" 2>&1'
-                    )
-                    if ret != 0:
-                        print("[AUTH] WARNING: Secrets auto-update failed (permission denied) - update manually")
+                    print("[AUTH] refresh_token rotated -> attempting Secrets auto-update via GitHub API")
+                    if not update_github_secret("BASE_REFRESH_TOKEN", new_rt):
+                        print("[AUTH] WARNING: Secrets auto-update failed - update BASE_REFRESH_TOKEN manually")
                 print("[AUTH] BASE access token obtained successfully")
                 return data["access_token"]
             else:
@@ -59,8 +128,7 @@ def get_base_token():
     print("[AUTH ERROR] Neither BASE_REFRESH_TOKEN nor BASE_ACCESS_TOKEN is set.")
     sys.exit(1)
 
-
-# ── BASE item helpers ─────────────────────────────────────────────────────────
+# ── BASE item helpers ────────────────────────────────────────────────────────
 def is_public(item):
     visible = item.get("visible", item.get("is_visible", None))
     if visible in (True, 1, "1", "true"):
@@ -101,7 +169,6 @@ def _get_image_url(item):
     else:
         print(f"[IMG] id={item_id} -> no image URL found. Available keys: {[k for k in item.keys() if 'img' in k.lower() or 'image' in k.lower()]}")
     return fallback
-
 
 # ── BASE item fetching ────────────────────────────────────────────────────────
 def fetch_items(base_token):
@@ -148,7 +215,6 @@ def fetch_items(base_token):
         print(f"  id={it.get('item_id')} status={s!r} visible={v!r} public={pub} title={title!r}")
     return items
 
-
 # ── feed.xml generation ───────────────────────────────────────────────────────
 def build_feed(items):
     rss = ET.Element("rss", version="2.0")
@@ -176,7 +242,6 @@ def build_feed(items):
         ET.SubElement(e, "g:condition").text = "new"
     print(f"[INFO] feed.xml: {count} public items")
     return ET.tostring(rss, encoding="unicode", xml_declaration=False)
-
 
 # ── Instagram posting ─────────────────────────────────────────────────────────
 def ig_post(item):
@@ -251,7 +316,6 @@ def ig_post(item):
     post_id = resp2.json().get("id", "unknown")
     print(f"[IG] SUCCESS! post_id={post_id}")
     return True
-
 
 # ── Deduplication helpers ─────────────────────────────────────────────────────
 HISTORY_FILE = "posted_history.json"
