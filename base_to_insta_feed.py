@@ -6,7 +6,7 @@ import traceback
 import requests
 import xml.etree.ElementTree as ET
 
-# -- Environment variables ---------------------------------------------------
+# ── Environment variables ─────────────────────────────────────────────────────
 CLIENT_ID     = os.environ.get("BASE_CLIENT_ID", "").strip()
 CLIENT_SECRET = os.environ.get("BASE_CLIENT_SECRET", "").strip()
 REFRESH_TOKEN = os.environ.get("BASE_REFRESH_TOKEN", "").strip()
@@ -19,7 +19,7 @@ DEBUG         = True   # forced ON for diagnostics
 DRY_RUN       = os.environ.get("DRY_RUN", "false").lower() == "true"
 
 
-# -- BASE authentication -----------------------------------------------------
+# ── BASE authentication ───────────────────────────────────────────────────────
 def get_base_token():
     print(f"[AUTH] REFRESH_TOKEN set: {bool(REFRESH_TOKEN)} | CLIENT_ID set: {bool(CLIENT_ID)}")
     if REFRESH_TOKEN and CLIENT_ID and CLIENT_SECRET:
@@ -60,7 +60,7 @@ def get_base_token():
     sys.exit(1)
 
 
-# -- BASE item helpers -------------------------------------------------------
+# ── BASE item helpers ─────────────────────────────────────────────────────────
 def is_public(item):
     visible = item.get("visible", item.get("is_visible", None))
     if visible in (True, 1, "1", "true"):
@@ -84,7 +84,7 @@ def _get_image_url(item):
             print(f"[IMG] id={item_id} -> {url[:80]}")
             return url
 
-    # Pattern 2: flat fields img1_origin, img1_url, img1_thumb_url, etc.
+    # Pattern 2: flat fields  img1_origin, img1_url, img1_thumb_url, etc.
     for suffix in ("origin", "url", "thumb_url"):
         for prefix in ("img1", "image1", "img"):
             key = f"{prefix}_{suffix}"
@@ -103,7 +103,7 @@ def _get_image_url(item):
     return fallback
 
 
-# -- BASE item fetching -------------------------------------------------------
+# ── BASE item fetching ────────────────────────────────────────────────────────
 def fetch_items(base_token):
     headers = {"Authorization": f"Bearer {base_token}"}
     items, limit, offset = [], 100, 0
@@ -149,7 +149,7 @@ def fetch_items(base_token):
     return items
 
 
-# -- feed.xml generation ------------------------------------------------------
+# ── feed.xml generation ───────────────────────────────────────────────────────
 def build_feed(items):
     rss = ET.Element("rss", version="2.0")
     rss.set("xmlns:g", "http://base.google.com/ns/1.0")
@@ -178,7 +178,7 @@ def build_feed(items):
     return ET.tostring(rss, encoding="unicode", xml_declaration=False)
 
 
-# -- Instagram posting --------------------------------------------------------
+# ── Instagram posting ─────────────────────────────────────────────────────────
 def ig_post(item):
     print(f"\n[IG] ===== Starting post for item id={item.get('item_id')} =====")
 
@@ -253,18 +253,33 @@ def ig_post(item):
     return True
 
 
-# -- Deduplication helpers ----------------------------------------------------
+# ── Deduplication helpers ─────────────────────────────────────────────────────
 HISTORY_FILE = "posted_history.json"
 
 def load_history():
     try:
         with open(HISTORY_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
-        ids = set(str(x) for x in data.get("posted", []))
-        print(f"[HISTORY] Loaded {len(ids)} previously posted item IDs")
+        raw_posted = data.get("posted", [])
+        # [ID AUDIT] Normalize all IDs to str regardless of JSON type (int or str)
+        ids = set()
+        for x in raw_posted:
+            raw_type = type(x).__name__
+            str_id = str(x)
+            ids.add(str_id)
+            if DEBUG:
+                print(f"[HISTORY][AUDIT] id={str_id!r} raw_type={raw_type} -> stored as str")
+        print(f"[HISTORY] Loaded {len(ids)} previously posted item IDs: {sorted(ids)}")
         return data, ids
     except FileNotFoundError:
         print("[HISTORY] posted_history.json not found - starting fresh")
+        return {
+            "posted": [],
+            "_comment": "Automatically maintained by GitHub Actions. Do not edit manually.",
+            "_schema": "item_id as string"
+        }, set()
+    except json.JSONDecodeError as e:
+        print(f"[HISTORY][ERROR] JSON parse failed: {e} - starting fresh to prevent crash")
         return {
             "posted": [],
             "_comment": "Automatically maintained by GitHub Actions. Do not edit manually.",
@@ -278,7 +293,7 @@ def save_history(data, ids):
     print(f"[HISTORY] Saved {len(ids)} posted item IDs to {HISTORY_FILE}")
 
 
-# -- Main --------------------------------------------------------------------
+# ── Main ──────────────────────────────────────────────────────────────────────
 def main():
     print(f"[INFO] === KILLSTREET Instagram Auto-Post ===")
     print(f"[INFO] SHOP_ID={SHOP_ID} | DRY_RUN={DRY_RUN} | IG_MAX_POSTS={IG_MAX_POSTS} | DEBUG={DEBUG}")
@@ -320,11 +335,25 @@ def main():
 
     posted = 0
     for item in unposted_items[:IG_MAX_POSTS]:
+        item_id = str(item.get("item_id", ""))
+
+        # ── [SAFETY NET] Double-check: reload history from disk right before posting ──
+        # Guards against race conditions (concurrent runs) and in-loop saves by
+        # a previous iteration that may have updated the file since we started.
+        _, live_posted_ids = load_history()
+        if item_id in live_posted_ids:
+            print(f"[HISTORY][DOUBLE-CHECK][SKIP] item_id={item_id} already in on-disk history "
+                  f"(concurrent run or previous loop iteration) - skipping to prevent duplicate")
+            # Sync in-memory state with what's on disk
+            posted_ids.update(live_posted_ids)
+            time.sleep(3)
+            continue
+        print(f"[HISTORY][DOUBLE-CHECK][OK] item_id={item_id} not in on-disk history - safe to post")
+
         try:
             ok = ig_post(item)
             if ok:
                 posted += 1
-                item_id = str(item.get("item_id", ""))
                 if item_id:
                     posted_ids.add(item_id)
                     save_history(history_data, posted_ids)
