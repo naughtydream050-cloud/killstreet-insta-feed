@@ -6,7 +6,7 @@ import traceback
 import requests
 import xml.etree.ElementTree as ET
 
-# ── Environment variables ─────────────────────────────────────────────────────
+# -- Environment variables ---------------------------------------------------
 CLIENT_ID     = os.environ.get("BASE_CLIENT_ID", "").strip()
 CLIENT_SECRET = os.environ.get("BASE_CLIENT_SECRET", "").strip()
 REFRESH_TOKEN = os.environ.get("BASE_REFRESH_TOKEN", "").strip()
@@ -19,7 +19,7 @@ DEBUG         = True   # forced ON for diagnostics
 DRY_RUN       = os.environ.get("DRY_RUN", "false").lower() == "true"
 
 
-# ── BASE authentication ───────────────────────────────────────────────────────
+# -- BASE authentication -----------------------------------------------------
 def get_base_token():
     print(f"[AUTH] REFRESH_TOKEN set: {bool(REFRESH_TOKEN)} | CLIENT_ID set: {bool(CLIENT_ID)}")
     if REFRESH_TOKEN and CLIENT_ID and CLIENT_SECRET:
@@ -60,7 +60,7 @@ def get_base_token():
     sys.exit(1)
 
 
-# ── BASE item helpers ─────────────────────────────────────────────────────────
+# -- BASE item helpers -------------------------------------------------------
 def is_public(item):
     visible = item.get("visible", item.get("is_visible", None))
     if visible in (True, 1, "1", "true"):
@@ -84,7 +84,7 @@ def _get_image_url(item):
             print(f"[IMG] id={item_id} -> {url[:80]}")
             return url
 
-    # Pattern 2: flat fields  img1_origin, img1_url, img1_thumb_url, etc.
+    # Pattern 2: flat fields img1_origin, img1_url, img1_thumb_url, etc.
     for suffix in ("origin", "url", "thumb_url"):
         for prefix in ("img1", "image1", "img"):
             key = f"{prefix}_{suffix}"
@@ -103,7 +103,7 @@ def _get_image_url(item):
     return fallback
 
 
-# ── BASE item fetching ────────────────────────────────────────────────────────
+# -- BASE item fetching -------------------------------------------------------
 def fetch_items(base_token):
     headers = {"Authorization": f"Bearer {base_token}"}
     items, limit, offset = [], 100, 0
@@ -149,7 +149,7 @@ def fetch_items(base_token):
     return items
 
 
-# ── feed.xml generation ───────────────────────────────────────────────────────
+# -- feed.xml generation ------------------------------------------------------
 def build_feed(items):
     rss = ET.Element("rss", version="2.0")
     rss.set("xmlns:g", "http://base.google.com/ns/1.0")
@@ -178,7 +178,7 @@ def build_feed(items):
     return ET.tostring(rss, encoding="unicode", xml_declaration=False)
 
 
-# ── Instagram posting ─────────────────────────────────────────────────────────
+# -- Instagram posting --------------------------------------------------------
 def ig_post(item):
     print(f"\n[IG] ===== Starting post for item id={item.get('item_id')} =====")
 
@@ -253,11 +253,39 @@ def ig_post(item):
     return True
 
 
-# ── Main ──────────────────────────────────────────────────────────────────────
+# -- Deduplication helpers ----------------------------------------------------
+HISTORY_FILE = "posted_history.json"
+
+def load_history():
+    try:
+        with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        ids = set(str(x) for x in data.get("posted", []))
+        print(f"[HISTORY] Loaded {len(ids)} previously posted item IDs")
+        return data, ids
+    except FileNotFoundError:
+        print("[HISTORY] posted_history.json not found - starting fresh")
+        return {
+            "posted": [],
+            "_comment": "Automatically maintained by GitHub Actions. Do not edit manually.",
+            "_schema": "item_id as string"
+        }, set()
+
+def save_history(data, ids):
+    data["posted"] = sorted(list(ids), key=lambda x: int(x) if x.isdigit() else x)
+    with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    print(f"[HISTORY] Saved {len(ids)} posted item IDs to {HISTORY_FILE}")
+
+
+# -- Main --------------------------------------------------------------------
 def main():
     print(f"[INFO] === KILLSTREET Instagram Auto-Post ===")
     print(f"[INFO] SHOP_ID={SHOP_ID} | DRY_RUN={DRY_RUN} | IG_MAX_POSTS={IG_MAX_POSTS} | DEBUG={DEBUG}")
     print(f"[INFO] IG_TOKEN set={bool(IG_TOKEN)} | IG_USER_ID set={bool(IG_USER_ID)}")
+
+    # Load posted history (deduplication)
+    history_data, posted_ids = load_history()
 
     # Fetch BASE items
     base_token = get_base_token()
@@ -277,24 +305,36 @@ def main():
         return
 
     public_items = [i for i in all_items if is_public(i)]
-    print(f"[IG] {len(public_items)} public items found -> posting up to {IG_MAX_POSTS}")
 
-    if not public_items:
-        print("[IG] No public items available to post")
+    # Filter out already-posted items
+    unposted_items = [i for i in public_items if str(i.get("item_id", "")) not in posted_ids]
+    print(f"[HISTORY] {len(public_items)} public items | "
+          f"{len(public_items) - len(unposted_items)} already posted | "
+          f"{len(unposted_items)} new to post")
+
+    if not unposted_items:
+        print("[IG] All public items have already been posted. Nothing to do.")
         return
 
+    print(f"[IG] Posting up to {IG_MAX_POSTS} unposted items")
+
     posted = 0
-    for item in public_items[:IG_MAX_POSTS]:
+    for item in unposted_items[:IG_MAX_POSTS]:
         try:
             ok = ig_post(item)
             if ok:
                 posted += 1
+                item_id = str(item.get("item_id", ""))
+                if item_id:
+                    posted_ids.add(item_id)
+                    save_history(history_data, posted_ids)
+                    print(f"[HISTORY] Recorded item_id={item_id}")
         except Exception as e:
             print(f"[IG ERROR] Unhandled exception for item {item.get('item_id')}: {e}")
             traceback.print_exc()
         time.sleep(3)
 
-    print(f"\n[IG] Done: {posted}/{min(len(public_items), IG_MAX_POSTS)} posted")
+    print(f"\n[IG] Done: {posted}/{min(len(unposted_items), IG_MAX_POSTS)} posted")
 
 
 if __name__ == "__main__":
