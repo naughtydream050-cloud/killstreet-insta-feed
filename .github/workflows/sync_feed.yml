@@ -2,19 +2,19 @@ name: Sync BASE Feed
 
 on:
   schedule:
-    - cron: '0 13 * * 0'   # 毎週日曜 22:00 JST
+    - cron: '0 13 * * 0'   # Every Sunday 22:00 JST
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'DRY_RUN (投稿しない確認実行)'
+        description: 'DRY_RUN (no actual post)'
         required: false
         default: 'false'
       ig_max_posts:
-        description: '最大投稿件数 (default: 1)'
+        description: 'Max posts (default: 1)'
         required: false
         default: '1'
       debug:
-        description: 'DEBUG モード'
+        description: 'DEBUG mode'
         required: false
         default: 'false'
 
@@ -49,6 +49,20 @@ jobs:
           DRY_RUN:            ${{ github.event.inputs.dry_run || 'false' }}
           IG_MAX_POSTS:       ${{ github.event.inputs.ig_max_posts || '1' }}
           DEBUG:              ${{ github.event.inputs.debug || 'false' }}
+
+      - name: Persist posted_history.json
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add posted_history.json
+          if git diff --staged --quiet; then
+            echo "[HISTORY] No new posts - nothing to commit"
+          else
+            git commit -m "chore: update posted_history.json [skip ci]"
+            git push
+            echo "[HISTORY] posted_history.json pushed to GitHub"
+          fi
 
       - uses: actions/upload-pages-artifact@v3
         with:
