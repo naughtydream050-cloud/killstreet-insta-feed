@@ -418,7 +418,7 @@ def run_codex_for_prompt(
         message = result.stderr.strip() or result.stdout.strip()
         raise RuntimeError(f"Codex command failed: {message}")
 
-    output = result.stdout.strip()
+    output = extract_codex_output(result.stdout)
     if not output:
         output = result.stderr.strip()
     if not output:
@@ -426,6 +426,24 @@ def run_codex_for_prompt(
 
     write_reply(reply_file, output + "\n", dry_run=False)
     return True
+
+
+def extract_codex_output(stdout: str) -> str:
+    messages: list[str] = []
+    for line in stdout.splitlines():
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if event.get("type") != "item.completed":
+            continue
+        item = event.get("item") or {}
+        if item.get("type") == "agent_message" and item.get("text"):
+            messages.append(str(item["text"]).strip())
+
+    if messages:
+        return "\n\n".join(message for message in messages if message).strip()
+    return stdout.strip()
 
 
 def maybe_auto_run_codex(
