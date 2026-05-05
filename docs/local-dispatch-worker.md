@@ -44,7 +44,7 @@ python scripts/local_dispatch_worker.py --once --post-replies
 Run local Codex automatically for a single trusted issue:
 
 ```powershell
-python scripts/local_dispatch_worker.py --once --issue 8 --follow-in-progress --auto-run-codex --allow-author naughtydream050-cloud
+python scripts/local_dispatch_worker.py --once --issue 8 --follow-in-progress --auto-run-codex --allow-author naughtydream050-cloud --codex-command "codex exec --json --sandbox workspace-write -"
 ```
 
 Create or inspect the resume summary template:
