@@ -78,7 +78,6 @@ jobs:
           output-file: codex-result.md
           working-directory: .
           sandbox: workspace-write
-          codex-args: '["--skip-git-repo-check"]'
 
       - name: Post result comment
         if: always()
