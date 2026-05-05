@@ -66,6 +66,7 @@ jobs:
             fs.writeFileSync('codex-issue-prompt.md', prompt, 'utf8');
 
       - name: Run Codex
+        if: ${{ vars.CODEX_DISPATCH_ENABLE_API == 'true' }}
         id: run_codex
         uses: openai/codex-action@v1
         continue-on-error: true
@@ -83,6 +84,7 @@ jobs:
         if: always()
         uses: actions/github-script@v7
         env:
+          API_ENABLED: ${{ vars.CODEX_DISPATCH_ENABLE_API == 'true' }}
           CODEX_OUTCOME: ${{ steps.run_codex.outcome }}
           CODEX_FINAL_MESSAGE: ${{ steps.run_codex.outputs.final-message }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -90,15 +92,38 @@ jobs:
           github-token: ${{ github.token }}
           script: |
             const fs = require('fs');
+            const apiEnabled = process.env.API_ENABLED === 'true';
             const fileMessage = fs.existsSync('codex-result.md')
               ? fs.readFileSync('codex-result.md', 'utf8').trim()
               : '';
             const outputMessage = (process.env.CODEX_FINAL_MESSAGE || '').trim();
-            const result = fileMessage || outputMessage || 'Codex did not produce a result. Check the workflow logs.';
+            const codexOutcome = process.env.CODEX_OUTCOME || 'skipped';
+
+            let status = codexOutcome;
+            let result = fileMessage || outputMessage;
+
+            if (!apiEnabled) {
+              status = 'free-mode-ready';
+              result = [
+                'Free-mode result: the dispatch pipeline reached the step immediately before OpenAI API execution.',
+                '',
+                '- Issue body was received and converted into a Codex prompt.',
+                '- Repository checkout and dependency setup completed.',
+                '- OpenAI API execution was intentionally skipped to avoid paid API usage.',
+                '- Set repository variable CODEX_DISPATCH_ENABLE_API=true only when a usable OpenAI API quota is available.',
+              ].join('\n');
+            } else if (!result) {
+              status = codexOutcome === 'failure' ? 'blocked' : codexOutcome;
+              result = [
+                'Codex did not produce a result.',
+                'If the logs show quota exceeded, the workflow is working but the OpenAI API key has no available quota.',
+              ].join('\n');
+            }
+
             const body = [
               '## Codex dispatch result',
               '',
-              `- Status: ${process.env.CODEX_OUTCOME}`,
+              `- Status: ${status}`,
               `- Run: ${process.env.RUN_URL}`,
               '',
               result,
