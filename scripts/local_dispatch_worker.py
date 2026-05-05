@@ -40,7 +40,7 @@ def run_gh(args: list[str]) -> str:
 
 
 def ensure_gh_auth() -> None:
-    run_gh(["auth", "status"])
+    run_gh(["auth", "status", "--active"])
 
 
 def ensure_label(repo: str, name: str, color: str, description: str) -> None:
