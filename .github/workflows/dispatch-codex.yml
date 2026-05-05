@@ -1,37 +1,112 @@
-name: Codex Dispatch
+name: Codex Dispatch Worker
 
 on:
   issues:
     types: [labeled]
 
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
 jobs:
-  run-codex:
-    if: contains(github.event.issue.labels.*.name, 'dispatch')
+  dispatch:
+    if: github.event.label.name == 'dispatch'
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Save issue body
-        run: echo "${{ github.event.issue.body }}" > codex-issue-prompt.md
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
 
-      - name: Install Codex
-        run: npm install -g @openai/codex
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-      - name: Run Codex
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: codex exec codex-issue-prompt.md > codex-result.md
+      - name: Install repository dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f package-lock.json ]; then
+            npm ci
+          elif [ -f package.json ]; then
+            npm install
+          fi
+          if [ -f requirements.txt ]; then
+            python -m pip install --upgrade pip
+            python -m pip install -r requirements.txt
+          fi
 
-      - name: Comment result
+      - name: Prepare issue prompt
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            const body = fs.readFileSync('codex-result.md', 'utf8');
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
+            const issue = context.payload.issue;
+            const body = issue.body || '';
+            const prompt = [
+              `Repository: ${context.repo.owner}/${context.repo.repo}`,
+              `Issue: #${issue.number} ${issue.title}`,
+              '',
+              'You are Codex running in GitHub Actions.',
+              'Process the issue body below end-to-end.',
+              'Make any required repository changes, run relevant checks, commit and push if needed, and summarize the result.',
+              'Never print secrets. If a required secret is missing, report that clearly.',
+              '',
+              'Issue body:',
+              body,
+            ].join('\n');
+            fs.writeFileSync('codex-issue-prompt.md', prompt, 'utf8');
+
+      - name: Run Codex
+        id: run_codex
+        uses: openai/codex-action@v1
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          prompt-file: codex-issue-prompt.md
+          output-file: codex-result.md
+          working-directory: .
+          sandbox: workspace-write
+          codex-args: '["--skip-git-repo-check"]'
+
+      - name: Post result comment
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          CODEX_OUTCOME: ${{ steps.run_codex.outcome }}
+          CODEX_FINAL_MESSAGE: ${{ steps.run_codex.outputs.final-message }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const fs = require('fs');
+            const fileMessage = fs.existsSync('codex-result.md')
+              ? fs.readFileSync('codex-result.md', 'utf8').trim()
+              : '';
+            const outputMessage = (process.env.CODEX_FINAL_MESSAGE || '').trim();
+            const result = fileMessage || outputMessage || 'Codex did not produce a result. Check the workflow logs.';
+            const body = [
+              '## Codex dispatch result',
+              '',
+              `- Status: ${process.env.CODEX_OUTCOME}`,
+              `- Run: ${process.env.RUN_URL}`,
+              '',
+              result,
+            ].join('\n');
+            await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body
+              issue_number: context.payload.issue.number,
+              body,
             });
