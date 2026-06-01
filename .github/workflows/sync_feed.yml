@@ -2,19 +2,19 @@ name: Sync BASE Feed
 
 on:
   schedule:
-    - cron: '0 13 * * 0'   # 毎週日曜 22:00 JST
+    - cron: '0 13 * * 0'   # Every Sunday 22:00 JST
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'DRY_RUN (投稿しない確認実行)'
+        description: 'Dry run without Instagram posting or history update'
         required: false
         default: 'false'
       ig_max_posts:
-        description: '最大投稿件数 (default: 1)'
+        description: 'Maximum Instagram posts per run'
         required: false
         default: '1'
       debug:
-        description: 'DEBUG モード'
+        description: 'Enable debug logs'
         required: false
         default: 'false'
 
@@ -33,7 +33,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - run: pip install requests PyNaCl
+      - run: pip install -r requirements.txt
 
       - name: Run sync script
         run: python base_to_insta_feed.py
