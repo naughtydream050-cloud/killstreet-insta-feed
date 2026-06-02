@@ -108,8 +108,15 @@ def fetch_assets():
         print("[STORY] BASE API source=base_api")
     except BaseApiError as e:
         print(f"[STORY][WARN] BASE API failed: {e}")
-        items = fetch_items_from_feed_fallback()
-        print("[STORY] BASE API source=feed_fallback")
+        try:
+            items = fetch_items_from_feed_fallback()
+            print("[STORY] BASE API source=feed_fallback")
+        except BaseApiError as fallback_error:
+            if assets:
+                print(f"[STORY][WARN] feed fallback failed, continuing with instagram_media_assets={len(assets)}: {fallback_error}")
+                items = []
+            else:
+                raise
 
     for item in items:
         if not is_public(item):
