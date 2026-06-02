@@ -1,5 +1,16 @@
 {
-  "stories": [],
+  "stories": [
+    {
+      "asset_id": "18112904737869275",
+      "asset_type": "instagram_media",
+      "title": "Classic \"喋りすぎ NO TALK\" Buck T-Shirt",
+      "template": "morning_worldview",
+      "story_id": "17876831655607924",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_26801826842_morning_worldview_18112904737869275.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-06-02T06:08:32.178669Z"
+    }
+  ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
   "_schema": "asset_id as string, posted_at as UTC ISO-8601"
 }
