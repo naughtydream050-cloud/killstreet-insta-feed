@@ -1,0 +1,77 @@
+name: Post AI Video Story
+
+on:
+  schedule:
+    - cron: '30 13 * * *'   # JST 22:30
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Generate/post dry run'
+        required: false
+        default: 'true'
+      force_post:
+        description: 'Ignore same-day video_history lock'
+        required: false
+        default: 'false'
+
+jobs:
+  post-ai-video-story:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install system fonts
+        run: sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
+
+      - name: Install video dependencies
+        run: npm install --no-save @gradio/client @ffmpeg-installer/ffmpeg
+
+      - name: Prepare AI video story
+        run: node scripts/video_ai_story_auto.mjs --prepare-only
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HUGGINGFACE_TOKEN: ${{ secrets.HUGGINGFACE_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          PAGES_BASE_URL: ${{ vars.PAGES_BASE_URL || format('https://{0}.github.io/{1}', github.repository_owner, github.event.repository.name) }}
+          SHOP_URL_DISPLAY: ${{ vars.SHOP_URL_DISPLAY || 'KILLSTREET2.BASE.SHOP' }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+          FORCE_POST: ${{ github.event.inputs.force_post || 'false' }}
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/
+
+      - id: deploy
+        uses: actions/deploy-pages@v4
+
+      - name: Post prepared AI video story
+        run: node scripts/video_ai_story_auto.mjs --post-prepared .video_story_payload.json
+        env:
+          INSTAGRAM_TOKEN: ${{ secrets.INSTAGRAM_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          GRAPH_API_VERSION: ${{ vars.GRAPH_API_VERSION || 'v25.0' }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+
+      - name: Persist video_history.json
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add video_history.json
+          if git diff --staged --quiet; then
+            echo "[VIDEO HISTORY] No video history changes - nothing to commit"
+          else
+            git commit -m "chore: update video_history.json [skip ci]"
+            git push
+            echo "[VIDEO HISTORY] video_history.json pushed to GitHub"
+          fi
