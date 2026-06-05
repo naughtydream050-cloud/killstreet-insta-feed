@@ -30,6 +30,9 @@ jobs:
             exit 1
           fi
 
+          IG_USER_ID="$(printf '%s' "${IG_USER_ID}" | tr -d '\r\n[:space:]')"
+          INSTAGRAM_TOKEN="$(printf '%s' "${INSTAGRAM_TOKEN}" | tr -d '\r\n[:space:]')"
+          API_VERSION="$(printf '%s' "${API_VERSION}" | tr -d '\r\n[:space:]')"
           api="https://graph.facebook.com/${API_VERSION}"
           create_json="$(curl -sS -X POST "${api}/${IG_USER_ID}/media" \
             -d "media_type=STORIES" \
