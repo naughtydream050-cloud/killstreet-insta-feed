@@ -1,5 +1,16 @@
 {
-  "videos": [],
+  "videos": [
+    {
+      "story_id": "18104800234822704",
+      "container_id": "18074005190476636",
+      "product_title": "Classic \"喋りすぎ NO TALK\" Buck T-Shirt",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-06-07_27091180626.mp4",
+      "posted_date_jst": "2026-06-07",
+      "posted_at": "2026-06-07T11:28:08.627Z",
+      "source": "hf_video_auto",
+      "generation_mode": "static_product_video_fallback"
+    }
+  ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
   "_schema": "posted stories generated from AI video; success records only"
 }
