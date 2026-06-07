@@ -19,5 +19,5 @@ Safety rules:
 
 Operational notes:
 
-- HF/ZeroGPU quota or congestion can fail generation. In that case the workflow fails and does not post.
+- HF/ZeroGPU quota or congestion can fail generation. In that case the workflow falls back to a 6-second MP4 made from the product image, so the daily Story can still post.
 - The generated video is for worldview/teaser use. Product-detail posts should use fixed original product images or lower-motion edits because HF can alter garment text and print.

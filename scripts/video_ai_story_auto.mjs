@@ -17,6 +17,7 @@ const GITHUB_REPOSITORY = (process.env.GITHUB_REPOSITORY || "naughtydream050-clo
 const GITHUB_RUN_ID = (process.env.GITHUB_RUN_ID || String(Date.now())).trim();
 const PAGES_BASE_URL = (process.env.PAGES_BASE_URL || `https://${GITHUB_REPOSITORY.split("/")[0]}.github.io/${GITHUB_REPOSITORY.split("/")[1]}`).replace(/\/$/, "");
 const GRAPH_API_VERSION = (process.env.GRAPH_API_VERSION || "v25.0").trim();
+const VIDEO_FALLBACK_STATIC = (process.env.VIDEO_FALLBACK_STATIC || "true").trim().toLowerCase() === "true";
 
 const PRODUCT_TITLE = process.env.VIDEO_PRODUCT_TITLE || 'Classic "\u558B\u308A\u3059\u304E NO TALK" Buck T-Shirt';
 const SHOP_URL_DISPLAY = process.env.SHOP_URL_DISPLAY || "KILLSTREET2.BASE.SHOP";
@@ -124,8 +125,37 @@ function fontPath(bold = false) {
   return candidates[candidates.length - 1];
 }
 
+function filterFilePath(filePath) {
+  return path.relative(ROOT, filePath).replaceAll("\\", "/");
+}
+
 function drawText({ font, textfile, y, size, color = "white@0.96" }) {
-  return `drawtext=fontfile='${font}':textfile='${textfile}':x=(w-text_w)/2:y=${y}:fontsize=${size}:fontcolor=${color}:line_spacing=8`;
+  return `drawtext=fontfile='${font}':textfile='${filterFilePath(textfile)}':x=(w-text_w)/2:y=${y}:fontsize=${size}:fontcolor=${color}:line_spacing=8`;
+}
+
+async function writeOverlayTextFiles(textDir) {
+  await mkdir(textDir, { recursive: true });
+  const files = {
+    brand: path.join(textDir, "brand.txt"),
+    product: path.join(textDir, "product.txt"),
+    shop: path.join(textDir, "shop.txt"),
+    cta: path.join(textDir, "cta.txt"),
+  };
+  await writeFile(files.brand, BRAND_TEXT, "utf8");
+  await writeFile(files.product, PRODUCT_TITLE, "utf8");
+  await writeFile(files.shop, SHOP_URL_DISPLAY, "utf8");
+  await writeFile(files.cta, CTA_TEXT, "utf8");
+  return files;
+}
+
+function overlayFilters(files, inputLabel = "base") {
+  return [
+    `[${inputLabel}]drawbox=x=54:y=1488:w=972:h=322:color=black@0.56:t=fill[v1]`,
+    `[v1]${drawText({ font: fontPath(true), textfile: files.brand, y: 106, size: 34, color: "white@0.82" })}[v2]`,
+    `[v2]${drawText({ font: fontPath(true), textfile: files.product, y: 1530, size: 42 })}[v3]`,
+    `[v3]${drawText({ font: fontPath(true), textfile: files.shop, y: 1634, size: 42, color: "white@0.94" })}[v4]`,
+    `[v4]${drawText({ font: fontPath(false), textfile: files.cta, y: 1708, size: 36, color: "white@0.90" })}[v]`,
+  ];
 }
 
 async function generateHfVideo(inputImage, rawVideo) {
@@ -158,25 +188,11 @@ async function generateHfVideo(inputImage, rawVideo) {
 }
 
 async function renderStoryVideo(rawVideo, storyVideo, textDir) {
-  await mkdir(textDir, { recursive: true });
-  const files = {
-    brand: path.join(textDir, "brand.txt"),
-    product: path.join(textDir, "product.txt"),
-    shop: path.join(textDir, "shop.txt"),
-    cta: path.join(textDir, "cta.txt"),
-  };
-  await writeFile(files.brand, BRAND_TEXT, "utf8");
-  await writeFile(files.product, PRODUCT_TITLE, "utf8");
-  await writeFile(files.shop, SHOP_URL_DISPLAY, "utf8");
-  await writeFile(files.cta, CTA_TEXT, "utf8");
+  const files = await writeOverlayTextFiles(textDir);
 
   const filter = [
     "[0:v]setpts=1.875*PTS,fps=30,scale=1080:-2:flags=lanczos,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black[base]",
-    "[base]drawbox=x=54:y=1488:w=972:h=322:color=black@0.56:t=fill[v1]",
-    `[v1]${drawText({ font: fontPath(true), textfile: files.brand, y: 106, size: 34, color: "white@0.82" })}[v2]`,
-    `[v2]${drawText({ font: fontPath(true), textfile: files.product, y: 1530, size: 42 })}[v3]`,
-    `[v3]${drawText({ font: fontPath(true), textfile: files.shop, y: 1634, size: 42, color: "white@0.94" })}[v4]`,
-    `[v4]${drawText({ font: fontPath(false), textfile: files.cta, y: 1708, size: 36, color: "white@0.90" })}[v]`,
+    ...overlayFilters(files),
   ].join(";");
 
   await runFfmpeg([
@@ -190,6 +206,38 @@ async function renderStoryVideo(rawVideo, storyVideo, textDir) {
     "-an",
     "-t",
     "6",
+    "-c:v",
+    "libx264",
+    "-pix_fmt",
+    "yuv420p",
+    "-r",
+    "30",
+    "-movflags",
+    "+faststart",
+    storyVideo,
+  ]);
+}
+
+async function renderFallbackStoryVideo(inputImage, storyVideo, textDir) {
+  const files = await writeOverlayTextFiles(textDir);
+  const filter = [
+    "[0:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,fps=30[base]",
+    ...overlayFilters(files),
+  ].join(";");
+
+  await runFfmpeg([
+    "-y",
+    "-loop",
+    "1",
+    "-t",
+    "6",
+    "-i",
+    inputImage,
+    "-filter_complex",
+    filter,
+    "-map",
+    "[v]",
+    "-an",
     "-c:v",
     "libx264",
     "-pix_fmt",
@@ -226,9 +274,22 @@ async function prepare() {
   console.log(`[AI VIDEO] product_image_url=${imageUrl}`);
   console.log(`[AI VIDEO] hf_space=${SPACE}`);
 
+  let generationMode = "hf_video";
+  let hfError = "";
   if (!DRY_RUN) {
-    await generateHfVideo(inputImage, rawVideo);
-    await renderStoryVideo(rawVideo, storyVideo, path.join(WORK_DIR, `${baseName}_text`));
+    try {
+      await generateHfVideo(inputImage, rawVideo);
+      await renderStoryVideo(rawVideo, storyVideo, path.join(WORK_DIR, `${baseName}_text`));
+    } catch (error) {
+      hfError = error?.message || String(error);
+      console.log(`[AI VIDEO][WARN] HF generation failed: ${shortText(hfError, 500)}`);
+      if (!VIDEO_FALLBACK_STATIC) {
+        throw error;
+      }
+      generationMode = "static_product_video_fallback";
+      console.log("[AI VIDEO] fallback=static_product_video");
+      await renderFallbackStoryVideo(inputImage, storyVideo, path.join(WORK_DIR, `${baseName}_text`));
+    }
   } else {
     console.log("[AI VIDEO][DRY RUN] generation/render skipped");
   }
@@ -249,6 +310,9 @@ async function prepare() {
       duration: 3.2,
       steps: 4,
       output: "1080x1920 story mp4",
+      generation_mode: generationMode,
+      hf_error: hfError,
+      static_fallback_enabled: VIDEO_FALLBACK_STATIC,
     },
   };
   writeJson(PAYLOAD_FILE, payload);
@@ -341,6 +405,7 @@ async function postPrepared(payloadPath) {
     posted_date_jst: payload.posted_date_jst,
     posted_at: isoNow(),
     source: "hf_video_auto",
+    generation_mode: payload.settings?.generation_mode || "unknown",
   });
   history.videos = history.videos.slice(-120);
   writeJson(HISTORY_FILE, history);
