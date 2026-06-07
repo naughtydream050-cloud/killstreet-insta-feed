@@ -9,7 +9,10 @@
                        "posted_at":  "2026-06-07T11:28:08.627Z",
                        "source":  "hf_video_auto",
                        "generation_mode":  "static_product_video_fallback",
-                       "product_page_url":  "https://killstreet2.base.shop/items/138177407"
+                       "product_page_url":  "https://killstreet2.base.shop/items/138177407",
+                       "hf_attempted_at":  "2026-06-07T11:26:39.578Z",
+                       "hf_error":  "ZeroGPU quota exceeded during HF generation",
+                       "hf_skip_reason":  ""
                    }
                ],
     "_comment":  "Automatically maintained by GitHub Actions. AI video story posting history only.",

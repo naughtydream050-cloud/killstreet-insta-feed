@@ -18,8 +18,9 @@ Safety rules:
 - It records only successful AI video Story posts in `video_history.json`.
 - It skips automatically if `video_history.json` already has a success record for the same JST date, unless `force_post=true` is used manually.
 - It rotates products by selecting an unused product URL first, then the oldest used product URL.
+- It waits at least 26 hours between HF GPU generation attempts by default. During the cooldown it still posts a 6-second product-image MP4 fallback.
 
 Operational notes:
 
-- HF/ZeroGPU quota or congestion can fail generation. In that case the workflow falls back to a 6-second MP4 made from the product image, so the daily Story can still post.
+- HF/ZeroGPU quota or congestion can fail generation. The workflow also avoids calling HF again until `HF_MIN_HOURS_BETWEEN_ATTEMPTS` has elapsed. In either case it falls back to a 6-second MP4 made from the product image, so the daily Story can still post.
 - The generated video is for worldview/teaser use. Product-detail posts should use fixed original product images or lower-motion edits because HF can alter garment text and print.

@@ -18,6 +18,7 @@ const GITHUB_RUN_ID = (process.env.GITHUB_RUN_ID || String(Date.now())).trim();
 const PAGES_BASE_URL = (process.env.PAGES_BASE_URL || `https://${GITHUB_REPOSITORY.split("/")[0]}.github.io/${GITHUB_REPOSITORY.split("/")[1]}`).replace(/\/$/, "");
 const GRAPH_API_VERSION = (process.env.GRAPH_API_VERSION || "v25.0").trim();
 const VIDEO_FALLBACK_STATIC = (process.env.VIDEO_FALLBACK_STATIC || "true").trim().toLowerCase() === "true";
+const HF_MIN_HOURS_BETWEEN_ATTEMPTS = Number(process.env.HF_MIN_HOURS_BETWEEN_ATTEMPTS || "26");
 
 const PRODUCT_TITLE_OVERRIDE = process.env.VIDEO_PRODUCT_TITLE || "";
 const SHOP_URL_DISPLAY = process.env.SHOP_URL_DISPLAY || "KILLSTREET2.BASE.SHOP";
@@ -131,6 +132,41 @@ function selectProductUrl(productUrls, history) {
     return neverUsed;
   }
   return [...productUrls].sort((a, b) => (lastUsed.get(a) || 0) - (lastUsed.get(b) || 0))[0];
+}
+
+function lastHfAttemptAt(history) {
+  const rows = Array.isArray(history.videos) ? history.videos : [];
+  let latest = 0;
+  for (const row of rows) {
+    const raw = row.hf_attempted_at || "";
+    if (!raw) {
+      continue;
+    }
+    const time = Date.parse(raw);
+    if (Number.isFinite(time) && time > latest) {
+      latest = time;
+    }
+  }
+  return latest || null;
+}
+
+function shouldAttemptHf(history) {
+  if (!HF_MIN_HOURS_BETWEEN_ATTEMPTS || HF_MIN_HOURS_BETWEEN_ATTEMPTS <= 0) {
+    return { ok: true, reason: "disabled" };
+  }
+  const latest = lastHfAttemptAt(history);
+  if (!latest) {
+    return { ok: true, reason: "no_previous_hf_attempt" };
+  }
+  const elapsedHours = (Date.now() - latest) / (60 * 60 * 1000);
+  if (elapsedHours >= HF_MIN_HOURS_BETWEEN_ATTEMPTS) {
+    return { ok: true, reason: `elapsed_hours=${elapsedHours.toFixed(2)}` };
+  }
+  return {
+    ok: false,
+    reason: `hf_cooldown elapsed_hours=${elapsedHours.toFixed(2)} min_hours=${HF_MIN_HOURS_BETWEEN_ATTEMPTS}`,
+    last_hf_attempted_at: new Date(latest).toISOString(),
+  };
 }
 
 async function fetchProductMetadata(productPageUrl) {
@@ -359,19 +395,31 @@ async function prepare() {
 
   let generationMode = "hf_video";
   let hfError = "";
+  let hfAttemptedAt = "";
+  let hfSkipReason = "";
   if (!DRY_RUN) {
-    try {
-      await generateHfVideo(inputImage, rawVideo);
-      await renderStoryVideo(rawVideo, storyVideo, path.join(WORK_DIR, `${baseName}_text`), product.product_title);
-    } catch (error) {
-      hfError = error?.message || String(error);
-      console.log(`[AI VIDEO][WARN] HF generation failed: ${shortText(hfError, 500)}`);
-      if (!VIDEO_FALLBACK_STATIC) {
-        throw error;
-      }
+    const hfGate = shouldAttemptHf(history);
+    if (!hfGate.ok) {
       generationMode = "static_product_video_fallback";
-      console.log("[AI VIDEO] fallback=static_product_video");
+      hfSkipReason = hfGate.reason;
+      console.log(`[AI VIDEO] hf_skipped=${hfSkipReason}`);
       await renderFallbackStoryVideo(inputImage, storyVideo, path.join(WORK_DIR, `${baseName}_text`), product.product_title);
+    } else {
+      try {
+        hfAttemptedAt = isoNow();
+        console.log(`[AI VIDEO] hf_attempt=true reason=${hfGate.reason}`);
+        await generateHfVideo(inputImage, rawVideo);
+        await renderStoryVideo(rawVideo, storyVideo, path.join(WORK_DIR, `${baseName}_text`), product.product_title);
+      } catch (error) {
+        hfError = error?.message || String(error);
+        console.log(`[AI VIDEO][WARN] HF generation failed: ${shortText(hfError, 500)}`);
+        if (!VIDEO_FALLBACK_STATIC) {
+          throw error;
+        }
+        generationMode = "static_product_video_fallback";
+        console.log("[AI VIDEO] fallback=static_product_video");
+        await renderFallbackStoryVideo(inputImage, storyVideo, path.join(WORK_DIR, `${baseName}_text`), product.product_title);
+      }
     }
   } else {
     console.log("[AI VIDEO][DRY RUN] generation/render skipped");
@@ -394,8 +442,11 @@ async function prepare() {
       steps: 4,
       output: "1080x1920 story mp4",
       generation_mode: generationMode,
+      hf_attempted_at: hfAttemptedAt,
       hf_error: hfError,
+      hf_skip_reason: hfSkipReason,
       static_fallback_enabled: VIDEO_FALLBACK_STATIC,
+      hf_min_hours_between_attempts: HF_MIN_HOURS_BETWEEN_ATTEMPTS,
     },
   };
   writeJson(PAYLOAD_FILE, payload);
@@ -490,6 +541,9 @@ async function postPrepared(payloadPath) {
     posted_at: isoNow(),
     source: "hf_video_auto",
     generation_mode: payload.settings?.generation_mode || "unknown",
+    hf_attempted_at: payload.settings?.hf_attempted_at || "",
+    hf_error: payload.settings?.hf_error || "",
+    hf_skip_reason: payload.settings?.hf_skip_reason || "",
   });
   history.videos = history.videos.slice(-120);
   writeJson(HISTORY_FILE, history);
