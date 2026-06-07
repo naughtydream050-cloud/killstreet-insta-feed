@@ -19,11 +19,12 @@ const PAGES_BASE_URL = (process.env.PAGES_BASE_URL || `https://${GITHUB_REPOSITO
 const GRAPH_API_VERSION = (process.env.GRAPH_API_VERSION || "v25.0").trim();
 const VIDEO_FALLBACK_STATIC = (process.env.VIDEO_FALLBACK_STATIC || "true").trim().toLowerCase() === "true";
 
-const PRODUCT_TITLE = process.env.VIDEO_PRODUCT_TITLE || 'Classic "\u558B\u308A\u3059\u304E NO TALK" Buck T-Shirt';
+const PRODUCT_TITLE_OVERRIDE = process.env.VIDEO_PRODUCT_TITLE || "";
 const SHOP_URL_DISPLAY = process.env.SHOP_URL_DISPLAY || "KILLSTREET2.BASE.SHOP";
 const CTA_TEXT = process.env.VIDEO_CTA_TEXT || "\u30D7\u30ED\u30D5\u30A3\u30FC\u30EB\u30EA\u30F3\u30AF\u304B\u3089\u8CFC\u5165";
 const BRAND_TEXT = process.env.VIDEO_BRAND_TEXT || "KILL STREET";
-const PRODUCT_PAGE_URL = process.env.VIDEO_PRODUCT_PAGE_URL || "https://killstreet2.base.shop/items/138177407";
+const PRODUCT_PAGE_URL_OVERRIDE = process.env.VIDEO_PRODUCT_PAGE_URL || "";
+const PRODUCT_LIST_URL = process.env.VIDEO_PRODUCT_LIST_URL || "https://killstreet2.base.shop/";
 const PRODUCT_IMAGE_URL = process.env.VIDEO_PRODUCT_IMAGE_URL || "";
 
 const SPACE = process.env.HF_VIDEO_SPACE || "multimodalart/Wan2.1-Fast";
@@ -80,27 +81,104 @@ async function fetchBuffer(url) {
   return Buffer.from(await response.arrayBuffer());
 }
 
-async function findProductImageUrl() {
-  if (PRODUCT_IMAGE_URL) {
-    return PRODUCT_IMAGE_URL;
+function cleanBaseTitle(title) {
+  return String(title || "")
+    .replaceAll("&quot;", '"')
+    .replaceAll("&#34;", '"')
+    .replaceAll("&amp;", "&")
+    .replace(/\s*\|\s*KILL\s*STREET.*$/i, "")
+    .replace(/\s*\|\s*KILLSTREET.*$/i, "")
+    .replace(/\s*[-|]\s*BASE\s*$/i, "")
+    .trim();
+}
+
+function productIdFromUrl(url) {
+  return String(url || "").match(/\/items\/(\d+)/)?.[1] || "";
+}
+
+async function fetchProductUrls() {
+  if (PRODUCT_PAGE_URL_OVERRIDE) {
+    return [PRODUCT_PAGE_URL_OVERRIDE];
   }
-  const response = await fetch(PRODUCT_PAGE_URL);
+  const response = await fetch(PRODUCT_LIST_URL);
+  if (!response.ok) {
+    throw new Error(`Product list fetch failed: HTTP ${response.status}`);
+  }
+  const html = await response.text();
+  const matches = [...html.matchAll(/(?:https:\/\/killstreet2\.base\.shop)?\/items\/\d+/g)];
+  const urls = matches
+    .map((match) => match[0])
+    .map((url) => (url.startsWith("http") ? url : `https://killstreet2.base.shop${url}`));
+  return [...new Set(urls)].sort((a, b) => productIdFromUrl(a).localeCompare(productIdFromUrl(b)));
+}
+
+function selectProductUrl(productUrls, history) {
+  if (!productUrls.length) {
+    throw new Error("No product URLs found");
+  }
+  const rows = Array.isArray(history.videos) ? history.videos : [];
+  const lastUsed = new Map();
+  for (const row of rows) {
+    const url = row.product_page_url || "";
+    if (!url) {
+      continue;
+    }
+    const postedAt = Date.parse(row.posted_at || row.posted_date_jst || "1970-01-01");
+    lastUsed.set(url, Math.max(lastUsed.get(url) || 0, Number.isFinite(postedAt) ? postedAt : 0));
+  }
+  const neverUsed = productUrls.find((url) => !lastUsed.has(url));
+  if (neverUsed) {
+    return neverUsed;
+  }
+  return [...productUrls].sort((a, b) => (lastUsed.get(a) || 0) - (lastUsed.get(b) || 0))[0];
+}
+
+async function fetchProductMetadata(productPageUrl) {
+  if (PRODUCT_IMAGE_URL && PRODUCT_TITLE_OVERRIDE) {
+    return {
+      product_page_url: productPageUrl,
+      product_image_url: PRODUCT_IMAGE_URL,
+      product_title: PRODUCT_TITLE_OVERRIDE,
+    };
+  }
+  const response = await fetch(productPageUrl);
   if (!response.ok) {
     throw new Error(`Product page fetch failed: HTTP ${response.status}`);
   }
   const html = await response.text();
-  const patterns = [
+  const imagePatterns = [
     /<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']/i,
     /<meta\s+content=["']([^"']+)["']\s+property=["']og:image["']/i,
     /"image"\s*:\s*"([^"]+)"/i,
   ];
-  for (const pattern of patterns) {
+  let imageUrl = PRODUCT_IMAGE_URL;
+  for (const pattern of imagePatterns) {
     const match = html.match(pattern);
     if (match?.[1]) {
-      return match[1].replaceAll("\\/", "/");
+      imageUrl = match[1].replaceAll("\\/", "/");
+      break;
     }
   }
-  throw new Error("Could not find product image URL");
+  const titlePatterns = [
+    /<meta\s+property=["']og:title["']\s+content=["']([^"']+)["']/i,
+    /<title>([^<]+)<\/title>/i,
+  ];
+  let title = PRODUCT_TITLE_OVERRIDE;
+  for (const pattern of titlePatterns) {
+    const match = html.match(pattern);
+    if (match?.[1]) {
+      title = cleanBaseTitle(match[1]);
+      break;
+    }
+  }
+  if (!imageUrl) {
+    throw new Error("Could not find product image URL");
+  }
+  return {
+    product_page_url: productPageUrl,
+    product_image_url: imageUrl,
+    product_title: title || `KILL STREET item ${productIdFromUrl(productPageUrl)}`,
+  };
 }
 
 async function runFfmpeg(args) {
@@ -133,7 +211,7 @@ function drawText({ font, textfile, y, size, color = "white@0.96" }) {
   return `drawtext=fontfile='${font}':textfile='${filterFilePath(textfile)}':x=(w-text_w)/2:y=${y}:fontsize=${size}:fontcolor=${color}:line_spacing=8`;
 }
 
-async function writeOverlayTextFiles(textDir) {
+async function writeOverlayTextFiles(textDir, productTitle) {
   await mkdir(textDir, { recursive: true });
   const files = {
     brand: path.join(textDir, "brand.txt"),
@@ -142,7 +220,7 @@ async function writeOverlayTextFiles(textDir) {
     cta: path.join(textDir, "cta.txt"),
   };
   await writeFile(files.brand, BRAND_TEXT, "utf8");
-  await writeFile(files.product, PRODUCT_TITLE, "utf8");
+  await writeFile(files.product, productTitle, "utf8");
   await writeFile(files.shop, SHOP_URL_DISPLAY, "utf8");
   await writeFile(files.cta, CTA_TEXT, "utf8");
   return files;
@@ -187,8 +265,8 @@ async function generateHfVideo(inputImage, rawVideo) {
   await writeFile(rawVideo, Buffer.from(await response.arrayBuffer()));
 }
 
-async function renderStoryVideo(rawVideo, storyVideo, textDir) {
-  const files = await writeOverlayTextFiles(textDir);
+async function renderStoryVideo(rawVideo, storyVideo, textDir, productTitle) {
+  const files = await writeOverlayTextFiles(textDir, productTitle);
 
   const filter = [
     "[0:v]setpts=1.875*PTS,fps=30,scale=1080:-2:flags=lanczos,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black[base]",
@@ -218,8 +296,8 @@ async function renderStoryVideo(rawVideo, storyVideo, textDir) {
   ]);
 }
 
-async function renderFallbackStoryVideo(inputImage, storyVideo, textDir) {
-  const files = await writeOverlayTextFiles(textDir);
+async function renderFallbackStoryVideo(inputImage, storyVideo, textDir, productTitle) {
+  const files = await writeOverlayTextFiles(textDir, productTitle);
   const filter = [
     "[0:v]scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black,fps=30[base]",
     ...overlayFilters(files),
@@ -269,9 +347,14 @@ async function prepare() {
   const storyVideo = path.join(OUT_DIR, `${baseName}.mp4`);
   const publicVideoUrl = `${PAGES_BASE_URL}/story/generated/${baseName}.mp4`;
 
-  const imageUrl = await findProductImageUrl();
-  await writeFile(inputImage, await fetchBuffer(imageUrl));
-  console.log(`[AI VIDEO] product_image_url=${imageUrl}`);
+  const productUrls = await fetchProductUrls();
+  const productUrl = selectProductUrl(productUrls, history);
+  const product = await fetchProductMetadata(productUrl);
+  await writeFile(inputImage, await fetchBuffer(product.product_image_url));
+  console.log(`[AI VIDEO] product_candidates=${productUrls.length}`);
+  console.log(`[AI VIDEO] product_page_url=${product.product_page_url}`);
+  console.log(`[AI VIDEO] product_title=${product.product_title}`);
+  console.log(`[AI VIDEO] product_image_url=${product.product_image_url}`);
   console.log(`[AI VIDEO] hf_space=${SPACE}`);
 
   let generationMode = "hf_video";
@@ -279,7 +362,7 @@ async function prepare() {
   if (!DRY_RUN) {
     try {
       await generateHfVideo(inputImage, rawVideo);
-      await renderStoryVideo(rawVideo, storyVideo, path.join(WORK_DIR, `${baseName}_text`));
+      await renderStoryVideo(rawVideo, storyVideo, path.join(WORK_DIR, `${baseName}_text`), product.product_title);
     } catch (error) {
       hfError = error?.message || String(error);
       console.log(`[AI VIDEO][WARN] HF generation failed: ${shortText(hfError, 500)}`);
@@ -288,7 +371,7 @@ async function prepare() {
       }
       generationMode = "static_product_video_fallback";
       console.log("[AI VIDEO] fallback=static_product_video");
-      await renderFallbackStoryVideo(inputImage, storyVideo, path.join(WORK_DIR, `${baseName}_text`));
+      await renderFallbackStoryVideo(inputImage, storyVideo, path.join(WORK_DIR, `${baseName}_text`), product.product_title);
     }
   } else {
     console.log("[AI VIDEO][DRY RUN] generation/render skipped");
@@ -298,9 +381,9 @@ async function prepare() {
     skip: false,
     prepared_at: isoNow(),
     posted_date_jst: today,
-    product_title: PRODUCT_TITLE,
-    product_page_url: PRODUCT_PAGE_URL,
-    product_image_url: imageUrl,
+    product_title: product.product_title,
+    product_page_url: product.product_page_url,
+    product_image_url: product.product_image_url,
     generated_story_video_path: storyVideo,
     public_story_video_url: publicVideoUrl,
     history_file: HISTORY_FILE,
@@ -401,6 +484,7 @@ async function postPrepared(payloadPath) {
     story_id: storyId,
     container_id: containerId,
     product_title: payload.product_title,
+    product_page_url: payload.product_page_url,
     video_url: payload.public_story_video_url,
     posted_date_jst: payload.posted_date_jst,
     posted_at: isoNow(),
