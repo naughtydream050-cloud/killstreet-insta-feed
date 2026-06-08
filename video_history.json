@@ -13,6 +13,20 @@
       "hf_attempted_at": "2026-06-07T15:08:42.545Z",
       "hf_error": "You have exceeded your ZeroGPU quota (150s requested vs. 29s left). Try again in 0:15:43. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens",
       "hf_skip_reason": ""
+    },
+    {
+      "story_id": "17971711776060641",
+      "container_id": "18074189858476636",
+      "product_title": "VINTAGE Dirty Paint Processed \"ワルモノ\" T-Shirt",
+      "product_page_url": "https://killstreet2.base.shop/items/137849083",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-06-09_27153395057.mp4",
+      "posted_date_jst": "2026-06-09",
+      "posted_at": "2026-06-08T16:57:07.004Z",
+      "source": "hf_video_auto",
+      "generation_mode": "static_product_video_fallback",
+      "hf_attempted_at": "",
+      "hf_error": "",
+      "hf_skip_reason": "hf_cooldown elapsed_hours=25.79 min_hours=26"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
