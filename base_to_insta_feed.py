@@ -27,6 +27,7 @@ TEST_ITEMS_JSON   = os.environ.get("TEST_ITEMS_JSON", "").strip()
 TEST_ITEMS_FILE   = os.environ.get("TEST_ITEMS_FILE", "").strip()
 FEED_FALLBACK_URL = "https://naughtydream050-cloud.github.io/killstreet-insta-feed/feed.xml"
 BASE_SHOP_URL     = os.environ.get("BASE_SHOP_URL", "https://killstreet2.base.shop/").strip() or "https://killstreet2.base.shop/"
+STORY_FALLBACK_ASSETS_FILE = os.environ.get("STORY_FALLBACK_ASSETS_FILE", "story_fallback_assets.json").strip() or "story_fallback_assets.json"
 
 
 class BaseApiError(RuntimeError):
@@ -446,6 +447,43 @@ def fetch_items_from_base_shop_scrape():
     return items
 
 
+def load_static_story_fallback_assets():
+    try:
+        with open(STORY_FALLBACK_ASSETS_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        print(f"[STATIC FALLBACK][ERROR] {STORY_FALLBACK_ASSETS_FILE} not found")
+        raise BaseApiError("static story fallback assets missing")
+    except json.JSONDecodeError as e:
+        print(f"[STATIC FALLBACK][ERROR] JSON parse failed: {e}")
+        raise BaseApiError("static story fallback assets invalid") from e
+
+    raw_items = data.get("items", data if isinstance(data, list) else [])
+    items = []
+    for raw in raw_items:
+        item_id = str(raw.get("item_id") or product_id_from_url(raw.get("item_url"))).strip()
+        image_url = str(raw.get("image_url", "")).strip()
+        if not item_id or not image_url:
+            print(f"[STATIC FALLBACK][SKIP] missing item_id or image_url: {raw}")
+            continue
+        items.append({
+            "item_id": item_id,
+            "title": clean_base_title(raw.get("title", "")) or f"KILL STREET item {item_id}",
+            "detail": str(raw.get("detail", "")),
+            "item_url": str(raw.get("item_url", "")),
+            "image_url": image_url,
+            "price": parse_price(raw.get("price", 0)),
+            "stock": 1,
+            "visible": True,
+            "status": "active",
+        })
+
+    if not items:
+        raise BaseApiError("static story fallback assets empty")
+    print(f"[STATIC FALLBACK] Loaded {len(items)} items from {STORY_FALLBACK_ASSETS_FILE}")
+    return items
+
+
 def fetch_items_from_feed_fallback():
     print("[WARN] BASE API failed; using feed fallback. Feed data may be stale.")
 
@@ -468,7 +506,11 @@ def fetch_items_from_feed_fallback():
         traceback.print_exc()
 
     print("[FEED FALLBACK] Public feed unavailable; using BASE shop scrape fallback")
-    return fetch_items_from_base_shop_scrape()
+    try:
+        return fetch_items_from_base_shop_scrape()
+    except BaseApiError as e:
+        print(f"[SHOP SCRAPE][WARN] unavailable: {e}; using static fallback assets")
+        return load_static_story_fallback_assets()
 
 
 # ── feed.xml generation ───────────────────────────────────────────────────────
