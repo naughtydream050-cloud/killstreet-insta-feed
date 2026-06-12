@@ -55,6 +55,23 @@
       "hf_attempted_at": "",
       "hf_error": "",
       "hf_skip_reason": "hf_cooldown elapsed_hours=24.50 min_hours=26"
+    },
+    {
+      "story_id": "",
+      "container_id": "",
+      "product_title": "Classic \"喋りすぎ NO TALK\" Buck T-Shirt",
+      "product_page_url": "https://killstreet2.base.shop/items/138177407",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-06-13_27428867236.mp4",
+      "prepared_date_jst": "2026-06-13",
+      "posted_date_jst": "",
+      "posted_at": "",
+      "source": "hf_video_auto",
+      "generation_mode": "static_product_video_fallback",
+      "hf_attempted_at": "2026-06-12T16:30:00.342Z",
+      "hf_error": "You have exceeded your ZeroGPU quota (150s requested vs. 74s left). Try again in 23:16:54. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens",
+      "hf_skip_reason": "",
+      "instagram_publish_status": "prepared",
+      "github_run_id": "27428867236"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
