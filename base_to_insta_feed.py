@@ -5,6 +5,8 @@ import time
 import base64
 import traceback
 import argparse
+import html
+import re
 import requests
 import xml.etree.ElementTree as ET
 
@@ -24,6 +26,7 @@ GH_REPO           = "naughtydream050-cloud/killstreet-insta-feed"
 TEST_ITEMS_JSON   = os.environ.get("TEST_ITEMS_JSON", "").strip()
 TEST_ITEMS_FILE   = os.environ.get("TEST_ITEMS_FILE", "").strip()
 FEED_FALLBACK_URL = "https://naughtydream050-cloud.github.io/killstreet-insta-feed/feed.xml"
+BASE_SHOP_URL     = os.environ.get("BASE_SHOP_URL", "https://killstreet2.base.shop/").strip() or "https://killstreet2.base.shop/"
 
 
 class BaseApiError(RuntimeError):
@@ -318,6 +321,33 @@ def parse_price(value):
     return int(digits) if digits else 0
 
 
+def clean_base_title(value):
+    text = html.unescape(str(value or "")).strip()
+    text = re.sub(r"\s*\|\s*KILL\s*STREET.*$", "", text, flags=re.I)
+    text = re.sub(r"\s*\|\s*KILLSTREET.*$", "", text, flags=re.I)
+    text = re.sub(r"\s*[-|]\s*BASE\s*$", "", text, flags=re.I)
+    return text.strip()
+
+
+def product_id_from_url(url):
+    m = re.search(r"/items/(\d+)", str(url or ""))
+    return m.group(1) if m else ""
+
+
+def html_meta_content(page, name):
+    patterns = [
+        rf'<meta\s+property=["\']{re.escape(name)}["\']\s+content=["\']([^"\']+)["\']',
+        rf'<meta\s+content=["\']([^"\']+)["\']\s+property=["\']{re.escape(name)}["\']',
+        rf'<meta\s+name=["\']{re.escape(name)}["\']\s+content=["\']([^"\']+)["\']',
+        rf'<meta\s+content=["\']([^"\']+)["\']\s+name=["\']{re.escape(name)}["\']',
+    ]
+    for pattern in patterns:
+        m = re.search(pattern, page, flags=re.I)
+        if m:
+            return html.unescape(m.group(1)).replace("\\/", "/").strip()
+    return ""
+
+
 def xml_child_text(node, tag):
     for child in node:
         if child.tag.split("}", 1)[-1] == tag:
@@ -361,6 +391,61 @@ def parse_feed_items(feed_xml, source):
     return items
 
 
+def fetch_items_from_base_shop_scrape():
+    print(f"[SHOP SCRAPE] Loading product URLs from {BASE_SHOP_URL}")
+    try:
+        resp = requests.get(BASE_SHOP_URL, timeout=30)
+        print(f"[SHOP SCRAPE] shop response: HTTP {resp.status_code}")
+        if resp.status_code != 200:
+            raise BaseApiError(f"BASE shop page returned HTTP {resp.status_code}")
+    except Exception as e:
+        print(f"[SHOP SCRAPE][ERROR] shop page request failed: {e}")
+        traceback.print_exc()
+        raise BaseApiError("BASE shop scrape failed") from e
+
+    urls = []
+    for raw in re.findall(r'(?:https://killstreet2\.base\.shop)?/items/\d+', resp.text):
+        url = raw if raw.startswith("http") else f"https://killstreet2.base.shop{raw}"
+        if url not in urls:
+            urls.append(url)
+
+    items = []
+    for url in urls[:50]:
+        item_id = product_id_from_url(url)
+        try:
+            page_resp = requests.get(url, timeout=30)
+            print(f"[SHOP SCRAPE] item_id={item_id} response: HTTP {page_resp.status_code}")
+            if page_resp.status_code != 200:
+                continue
+            page = page_resp.text
+            title = clean_base_title(html_meta_content(page, "og:title"))
+            image_url = html_meta_content(page, "og:image")
+            if not title:
+                m = re.search(r"<title>(.*?)</title>", page, flags=re.I | re.S)
+                title = clean_base_title(m.group(1) if m else "")
+            if not item_id or not image_url:
+                print(f"[SHOP SCRAPE][SKIP] item_id={item_id!r} missing image")
+                continue
+            items.append({
+                "item_id": item_id,
+                "title": title or f"KILL STREET item {item_id}",
+                "detail": "",
+                "item_url": url,
+                "image_url": image_url,
+                "price": 0,
+                "stock": 1,
+                "visible": True,
+                "status": "active",
+            })
+        except Exception as e:
+            print(f"[SHOP SCRAPE][WARN] item_url={url} failed: {e}")
+
+    if not items:
+        raise BaseApiError("BASE shop scrape found no usable items")
+    print(f"[SHOP SCRAPE] Loaded {len(items)} items from BASE shop")
+    return items
+
+
 def fetch_items_from_feed_fallback():
     print("[WARN] BASE API failed; using feed fallback. Feed data may be stale.")
 
@@ -382,7 +467,8 @@ def fetch_items_from_feed_fallback():
         print(f"[FEED FALLBACK][ERROR] Public feed request failed: {e}")
         traceback.print_exc()
 
-    raise BaseApiError("BASE API failed and feed fallback was unavailable")
+    print("[FEED FALLBACK] Public feed unavailable; using BASE shop scrape fallback")
+    return fetch_items_from_base_shop_scrape()
 
 
 # ── feed.xml generation ───────────────────────────────────────────────────────
