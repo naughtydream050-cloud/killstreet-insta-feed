@@ -70,6 +70,62 @@ function writeJson(file, data) {
   fs.writeFileSync(file, JSON.stringify(data, null, 2) + "\n", "utf8");
 }
 
+function initialVideoHistory() {
+  return {
+    videos: [],
+    _comment: "Automatically maintained by GitHub Actions. AI video story posting history only.",
+    _schema: "posted stories generated from AI video; HF attempts are recorded when generation is attempted",
+  };
+}
+
+function updateVideoHistory(payload, fields = {}) {
+  const history = readJson(HISTORY_FILE, initialVideoHistory());
+  history.videos = Array.isArray(history.videos) ? history.videos : [];
+
+  const runId = String(payload.github_run_id || GITHUB_RUN_ID || "");
+  const videoUrl = String(payload.public_story_video_url || "");
+  const existingIndex = history.videos.findIndex((row) => {
+    if (runId && String(row.github_run_id || "") === runId) {
+      return true;
+    }
+    return videoUrl && String(row.video_url || "") === videoUrl;
+  });
+
+  const baseRow = {
+    story_id: "",
+    container_id: "",
+    product_title: payload.product_title,
+    product_page_url: payload.product_page_url,
+    video_url: payload.public_story_video_url,
+    prepared_date_jst: payload.posted_date_jst,
+    posted_date_jst: "",
+    posted_at: "",
+    source: "hf_video_auto",
+    generation_mode: payload.settings?.generation_mode || "unknown",
+    hf_attempted_at: payload.settings?.hf_attempted_at || "",
+    hf_error: payload.settings?.hf_error || "",
+    hf_skip_reason: payload.settings?.hf_skip_reason || "",
+    instagram_publish_status: "not_attempted",
+    github_run_id: runId,
+  };
+
+  if (existingIndex >= 0) {
+    history.videos[existingIndex] = {
+      ...history.videos[existingIndex],
+      ...baseRow,
+      ...fields,
+    };
+  } else {
+    history.videos.push({
+      ...baseRow,
+      ...fields,
+    });
+  }
+
+  history.videos = history.videos.slice(-120);
+  writeJson(HISTORY_FILE, history);
+}
+
 function shortText(value, max = 800) {
   return String(value || "").slice(0, max);
 }
@@ -367,7 +423,9 @@ async function renderFallbackStoryVideo(inputImage, storyVideo, textDir, product
 async function prepare() {
   const history = readJson(HISTORY_FILE, { videos: [] });
   const today = jstDateKey();
-  const alreadyPostedToday = (history.videos || []).some((row) => String(row.posted_date_jst || "").slice(0, 10) === today);
+  const alreadyPostedToday = (history.videos || []).some((row) => {
+    return row.story_id && String(row.posted_date_jst || "").slice(0, 10) === today;
+  });
   if (alreadyPostedToday && !FORCE_POST) {
     console.log(`[AI VIDEO] skip=already_posted_today date_jst=${today}`);
     writeJson(PAYLOAD_FILE, { skip: true, reason: "already_posted_today", posted_date_jst: today });
@@ -435,6 +493,7 @@ async function prepare() {
     generated_story_video_path: storyVideo,
     public_story_video_url: publicVideoUrl,
     history_file: HISTORY_FILE,
+    github_run_id: GITHUB_RUN_ID,
     settings: {
       space: SPACE,
       endpoint: ENDPOINT,
@@ -450,6 +509,12 @@ async function prepare() {
     },
   };
   writeJson(PAYLOAD_FILE, payload);
+  if (!DRY_RUN && hfAttemptedAt) {
+    updateVideoHistory(payload, {
+      instagram_publish_status: "prepared",
+    });
+    console.log("[AI VIDEO] video_history_updated=true reason=hf_attempt_recorded");
+  }
   if (!DRY_RUN) {
     const info = await stat(storyVideo);
     console.log(`[AI VIDEO] generated_story_video_path=${storyVideo}`);
@@ -525,28 +590,18 @@ async function postPrepared(payloadPath) {
   const storyId = publishJson.id;
   console.log(`[AI VIDEO] SUCCESS story_id=${storyId}`);
 
-  const history = readJson(HISTORY_FILE, {
-    videos: [],
-    _comment: "Automatically maintained by GitHub Actions. AI video story posting history only.",
-    _schema: "posted stories generated from AI video; success records only",
-  });
-  history.videos = Array.isArray(history.videos) ? history.videos : [];
-  history.videos.push({
-    story_id: storyId,
-    container_id: containerId,
-    product_title: payload.product_title,
-    product_page_url: payload.product_page_url,
-    video_url: payload.public_story_video_url,
-    posted_date_jst: payload.posted_date_jst,
-    posted_at: isoNow(),
-    source: "hf_video_auto",
-    generation_mode: payload.settings?.generation_mode || "unknown",
-    hf_attempted_at: payload.settings?.hf_attempted_at || "",
-    hf_error: payload.settings?.hf_error || "",
-    hf_skip_reason: payload.settings?.hf_skip_reason || "",
-  });
-  history.videos = history.videos.slice(-120);
-  writeJson(HISTORY_FILE, history);
+  if (payload.settings?.hf_attempted_at) {
+    updateVideoHistory(payload, {
+      story_id: storyId,
+      container_id: containerId,
+      posted_date_jst: payload.posted_date_jst,
+      posted_at: isoNow(),
+      instagram_publish_status: "published",
+    });
+    console.log("[AI VIDEO] video_history_updated=true reason=instagram_publish_success");
+  } else {
+    console.log("[AI VIDEO] video_history_updated=false reason=no_hf_attempt");
+  }
 }
 
 async function main() {
