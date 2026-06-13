@@ -732,7 +732,11 @@ def main():
     print(f"[IG] Posting up to {IG_MAX_POSTS} unposted items")
 
     posted = 0
-    for item in unposted_items[:IG_MAX_POSTS]:
+    attempted = 0
+    for item in unposted_items:
+        if posted >= IG_MAX_POSTS:
+            break
+        attempted += 1
         post_key = item_key(item)
 
         # ── [SAFETY NET] Double-check: reload history from disk right before posting ──
@@ -764,7 +768,7 @@ def main():
         time.sleep(3)
 
     expected = min(len(unposted_items), IG_MAX_POSTS)
-    print(f"\n[IG] Done: {posted}/{expected} posted")
+    print(f"\n[IG] Done: {posted}/{expected} posted | attempted={attempted}")
     if not DRY_RUN and expected > 0 and posted == 0:
         print("[IG ERROR] No selected products were posted successfully")
         sys.exit(1)
