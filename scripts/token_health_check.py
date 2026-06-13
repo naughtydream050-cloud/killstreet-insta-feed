@@ -76,12 +76,23 @@ def update_github_secret(secret_name: str, secret_value: str) -> bool:
     return ok
 
 
+def can_update_github_secrets() -> bool:
+    if not os.environ.get("GH_PAT_SECRETS", "").strip():
+        return False
+    try:
+        from nacl import public as _nacl_public  # noqa: F401
+    except ImportError:
+        return False
+    return True
+
+
 def check_instagram(
     session: requests.Session,
     token: str,
     ig_user_id: str,
     secret_updater: Callable[[str, str], bool] = update_github_secret,
     refresh_threshold_days: int = IG_REFRESH_THRESHOLD_DAYS,
+    can_save_secrets: bool = True,
 ) -> dict[str, Any]:
     if not token or not ig_user_id:
         return {"component": "instagram", "status": "missing", "reason": "INSTAGRAM_TOKEN or IG_USER_ID not set"}
@@ -133,6 +144,9 @@ def check_instagram(
     if seconds_left > refresh_threshold_days * 86400:
         base["refresh_status"] = "not_needed"
         return base
+    if not can_save_secrets:
+        base.update({"status": "valid_refresh_not_saved", "refresh_status": "secret_updater_missing"})
+        return base
 
     refreshed = session.get(
         f"https://graph.facebook.com/{GRAPH_API_VERSION}/refresh_access_token",
@@ -158,6 +172,7 @@ def check_base(
     client_id: str,
     client_secret: str,
     secret_updater: Callable[[str, str], bool] = update_github_secret,
+    can_save_secrets: bool = True,
 ) -> dict[str, Any]:
     if not access_token:
         current = requests.Response()
@@ -171,6 +186,9 @@ def check_base(
     base = {"component": "base", "status": "access_invalid", "http": current.status_code, "reason": short_error(current)}
     if not (refresh_token and client_id and client_secret):
         base.update({"refresh_status": "manual_reauth_required", "reason": "refresh token or client credentials missing"})
+        return base
+    if not can_save_secrets:
+        base.update({"refresh_status": "secret_updater_missing"})
         return base
 
     refreshed = session.post(
@@ -228,14 +246,21 @@ def classify_hf_generation_error(message: str) -> str:
 
 def main() -> int:
     session = requests.Session()
+    secret_updates_available = can_update_github_secrets()
     results = [
-        check_instagram(session, os.environ.get("INSTAGRAM_TOKEN", "").strip(), os.environ.get("IG_USER_ID", "").strip()),
+        check_instagram(
+            session,
+            os.environ.get("INSTAGRAM_TOKEN", "").strip(),
+            os.environ.get("IG_USER_ID", "").strip(),
+            can_save_secrets=secret_updates_available,
+        ),
         check_base(
             session,
             os.environ.get("BASE_ACCESS_TOKEN", "").strip(),
             os.environ.get("BASE_REFRESH_TOKEN", "").strip(),
             os.environ.get("BASE_CLIENT_ID", "").strip(),
             os.environ.get("BASE_CLIENT_SECRET", "").strip(),
+            can_save_secrets=secret_updates_available,
         ),
         check_hf(session, (os.environ.get("HF_TOKEN") or os.environ.get("HUGGINGFACE_TOKEN") or "").strip()),
     ]
