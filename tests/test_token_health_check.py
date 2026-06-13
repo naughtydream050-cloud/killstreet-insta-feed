@@ -76,7 +76,7 @@ class TokenHealthCheckTests(unittest.TestCase):
 
     def test_base_refreshes_access_and_refresh_token_when_access_invalid(self):
         responses = [
-            Mock(status_code=401, json=lambda: {"error": "invalid_request"}),
+            Mock(status_code=401, text="invalid_request", json=lambda: {"error": "invalid_request"}),
             Mock(
                 status_code=200,
                 json=lambda: {"access_token": "new-access", "refresh_token": "new-refresh"},
@@ -104,7 +104,7 @@ class TokenHealthCheckTests(unittest.TestCase):
 
     def test_base_does_not_refresh_when_secret_updates_unavailable(self):
         session = Mock()
-        session.get.return_value = Mock(status_code=401, json=lambda: {"error": "invalid_request"})
+        session.get.return_value = Mock(status_code=401, text="invalid_request", json=lambda: {"error": "invalid_request"})
 
         result = thc.check_base(
             session,
