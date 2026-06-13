@@ -1,4 +1,5 @@
 import json
+import os
 import unittest
 from unittest.mock import Mock
 
@@ -6,6 +7,17 @@ from scripts import token_health_check as thc
 
 
 class TokenHealthCheckTests(unittest.TestCase):
+    def test_secret_updater_reports_missing_without_token(self):
+        old = os.environ.pop("GH_PAT_SECRETS", None)
+        try:
+            result = thc.check_secret_updater()
+        finally:
+            if old is not None:
+                os.environ["GH_PAT_SECRETS"] = old
+
+        self.assertEqual(result["component"], "github_secret_updater")
+        self.assertEqual(result["status"], "missing")
+
     def test_instagram_refreshes_when_expiring_soon(self):
         responses = [
             Mock(

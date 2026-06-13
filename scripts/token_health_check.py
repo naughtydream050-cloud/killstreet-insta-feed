@@ -86,6 +86,16 @@ def can_update_github_secrets() -> bool:
     return True
 
 
+def check_secret_updater() -> dict[str, Any]:
+    if not os.environ.get("GH_PAT_SECRETS", "").strip():
+        return {"component": "github_secret_updater", "status": "missing", "reason": "GH_PAT_SECRETS not set"}
+    try:
+        from nacl import public as _nacl_public  # noqa: F401
+    except ImportError:
+        return {"component": "github_secret_updater", "status": "missing", "reason": "PyNaCl not installed"}
+    return {"component": "github_secret_updater", "status": "available"}
+
+
 def check_instagram(
     session: requests.Session,
     token: str,
@@ -248,6 +258,7 @@ def main() -> int:
     session = requests.Session()
     secret_updates_available = can_update_github_secrets()
     results = [
+        check_secret_updater(),
         check_instagram(
             session,
             os.environ.get("INSTAGRAM_TOKEN", "").strip(),
@@ -267,7 +278,17 @@ def main() -> int:
     for result in results:
         safe_print(result)
 
-    failing = {"missing", "invalid", "expired", "permission_missing", "refresh_failed", "refresh_verify_failed", "refreshed_not_saved", "valid_refresh_not_saved"}
+    failing = {
+        "missing",
+        "invalid",
+        "expired",
+        "permission_missing",
+        "access_invalid",
+        "refresh_failed",
+        "refresh_verify_failed",
+        "refreshed_not_saved",
+        "valid_refresh_not_saved",
+    }
     return 1 if any(result.get("status") in failing for result in results) else 0
 
 
