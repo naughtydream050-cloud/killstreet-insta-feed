@@ -72,6 +72,23 @@
       "hf_skip_reason": "",
       "instagram_publish_status": "prepared",
       "github_run_id": "27428867236"
+    },
+    {
+      "story_id": "18154277368470508",
+      "container_id": "18075081503476636",
+      "product_title": "\"KRUMP愛\"COTTON BASIC BUCK T-shirt",
+      "product_page_url": "https://killstreet2.base.shop/items/138757915",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-06-15_27503316678.mp4",
+      "prepared_date_jst": "2026-06-15",
+      "posted_date_jst": "2026-06-15",
+      "posted_at": "2026-06-14T15:25:45.854Z",
+      "source": "hf_video_auto",
+      "generation_mode": "hf_video",
+      "hf_attempted_at": "2026-06-14T15:23:46.978Z",
+      "hf_error": "",
+      "hf_skip_reason": "",
+      "instagram_publish_status": "published",
+      "github_run_id": "27503316678"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
