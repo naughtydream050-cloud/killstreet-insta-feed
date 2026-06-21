@@ -140,6 +140,23 @@
       "hf_skip_reason": "",
       "instagram_publish_status": "published",
       "github_run_id": "27836836160"
+    },
+    {
+      "story_id": "17990601254812258",
+      "container_id": "18076093442476636",
+      "product_title": "Trompe l&#039;oeil Full Print KILLSTREET Signature",
+      "product_page_url": "https://killstreet2.base.shop/items/141323342",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-06-22_27908753029.mp4",
+      "prepared_date_jst": "2026-06-22",
+      "posted_date_jst": "2026-06-22",
+      "posted_at": "2026-06-21T15:23:38.461Z",
+      "source": "hf_video_auto",
+      "generation_mode": "hf_video",
+      "hf_attempted_at": "2026-06-21T15:21:37.768Z",
+      "hf_error": "",
+      "hf_skip_reason": "",
+      "instagram_publish_status": "published",
+      "github_run_id": "27908753029"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
