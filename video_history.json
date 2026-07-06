@@ -276,6 +276,23 @@
       "hf_skip_reason": "",
       "instagram_publish_status": "prepared",
       "github_run_id": "28709779332"
+    },
+    {
+      "story_id": "18090486662138712",
+      "container_id": "18078404870476636",
+      "product_title": "VINTAGE Dirty Paint Processed \"ワルモノ\" T-Shirt",
+      "product_page_url": "https://killstreet2.base.shop/items/137849083",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-07-07_28807232767.mp4",
+      "prepared_date_jst": "2026-07-07",
+      "posted_date_jst": "2026-07-07",
+      "posted_at": "2026-07-06T16:36:43.777Z",
+      "source": "hf_video_auto",
+      "generation_mode": "hf_video",
+      "hf_attempted_at": "2026-07-06T16:34:39.077Z",
+      "hf_error": "",
+      "hf_skip_reason": "",
+      "instagram_publish_status": "published",
+      "github_run_id": "28807232767"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
