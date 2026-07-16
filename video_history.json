@@ -361,6 +361,23 @@
       "hf_skip_reason": "",
       "instagram_publish_status": "published",
       "github_run_id": "29343874855"
+    },
+    {
+      "story_id": "18087063695407575",
+      "container_id": "18079917008476636",
+      "product_title": "Full Design KRUMP Terminology BUCK T-shirt",
+      "product_page_url": "https://killstreet2.base.shop/items/139620541",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-07-17_29510367348.mp4",
+      "prepared_date_jst": "2026-07-17",
+      "posted_date_jst": "2026-07-17",
+      "posted_at": "2026-07-16T15:17:48.382Z",
+      "source": "hf_video_auto",
+      "generation_mode": "static_product_video_fallback",
+      "hf_attempted_at": "2026-07-16T15:16:38.317Z",
+      "hf_error": "RuntimeError",
+      "hf_skip_reason": "",
+      "instagram_publish_status": "published",
+      "github_run_id": "29510367348"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
