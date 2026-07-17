@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18050533766780734",
-      "asset_type": "instagram_media",
-      "title": "Trompe l'oeil Full Print KILLSTREET Signature Pullover Hoodie",
-      "template": "morning_worldview",
-      "story_id": "17955500679135318",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_26930508688_morning_worldview_18050533766780734.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-06-04T04:23:38.799649Z"
-    },
-    {
       "asset_id": "18114123226849672",
       "asset_type": "instagram_media",
       "title": "着ルストリート-KILL STREET-",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_29504627777_night_cta_18051643493562741.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-07-16T14:01:03.940532Z"
+    },
+    {
+      "asset_id": "18141661051527263",
+      "asset_type": "instagram_media",
+      "title": "\"どうせイベント前しかセッション来ねぇじゃん\"Buck Print T-shirt",
+      "template": "morning_worldview",
+      "story_id": "18082460006643273",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_29550977172_morning_worldview_18141661051527263.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-07-17T02:52:57.324767Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
