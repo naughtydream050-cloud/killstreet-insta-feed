@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "17919281058164109",
-      "asset_type": "instagram_media",
-      "title": "着ルストリート✖︎K.F.B SESSION k.f.b_session ",
-      "template": "night_cta",
-      "story_id": "18095187200584297",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_26961440189_night_cta_17919281058164109.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-06-04T15:24:05.594553Z"
-    },
-    {
       "asset_id": "18112904737869275",
       "asset_type": "instagram_media",
       "title": "Classic \"喋りすぎ NO TALK\" Buck T-Shirt",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_29565731215_afternoon_product_18082975670239671.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-07-17T08:15:01.084406Z"
+    },
+    {
+      "asset_id": "18129206458623032",
+      "asset_type": "instagram_media",
+      "title": "BUCK PANTS KRUMP TERMINOLOGY PRINT Dirty-Processed Paint",
+      "template": "night_cta",
+      "story_id": "17898563676499978",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_29585158094_night_cta_18129206458623032.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-07-17T13:45:43.737271Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
