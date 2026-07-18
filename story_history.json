@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18114123226849672",
-      "asset_type": "instagram_media",
-      "title": "着ルストリート-KILL STREET-",
-      "template": "night_cta",
-      "story_id": "18116838493839417",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_27022373363_night_cta_18114123226849672.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-06-05T14:58:38.105499Z"
-    },
-    {
       "asset_id": "17919281058164109",
       "asset_type": "instagram_media",
       "title": "着ルストリート✖︎K.F.B SESSION k.f.b_session ",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_29636599473_afternoon_product_18141661051527263.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-07-18T07:57:18.746211Z"
+    },
+    {
+      "asset_id": "18082975670239671",
+      "asset_type": "instagram_media",
+      "title": "BUCK PANTS KRUMP TERMINOLOGY PRINT Dirty-Processed Paint",
+      "template": "night_cta",
+      "story_id": "17947613706238121",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_29646009432_night_cta_18082975670239671.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-07-18T13:22:52.071707Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
