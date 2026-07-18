@@ -378,6 +378,23 @@
       "hf_skip_reason": "",
       "instagram_publish_status": "published",
       "github_run_id": "29510367348"
+    },
+    {
+      "story_id": "18399079366094074",
+      "container_id": "18080218712476636",
+      "product_title": "BUCK PANTS KRUMP TERMINOLOGY PRINT Dirty-Processed Paint",
+      "product_page_url": "https://killstreet2.base.shop/items/139697607",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-07-18_29648248907.mp4",
+      "prepared_date_jst": "2026-07-18",
+      "posted_date_jst": "2026-07-18",
+      "posted_at": "2026-07-18T14:34:38.110Z",
+      "source": "hf_video_auto",
+      "generation_mode": "static_product_video_fallback",
+      "hf_attempted_at": "2026-07-18T14:33:38.136Z",
+      "hf_error": "RuntimeError",
+      "hf_skip_reason": "",
+      "instagram_publish_status": "published",
+      "github_run_id": "29648248907"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
