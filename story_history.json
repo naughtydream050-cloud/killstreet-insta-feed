@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18112904737869275",
-      "asset_type": "instagram_media",
-      "title": "Classic \"喋りすぎ NO TALK\" Buck T-Shirt",
-      "template": "night_cta",
-      "story_id": "18176344771411686",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_27215927069_night_cta_18112904737869275.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-06-09T15:15:34.287480Z"
-    },
-    {
       "asset_id": "18050533766780734",
       "asset_type": "instagram_media",
       "title": "Trompe l'oeil Full Print KILLSTREET Signature Pullover Hoodie",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_29904445587_afternoon_product_18129206458623032.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-07-22T08:34:08.893873Z"
+    },
+    {
+      "asset_id": "18602359075021330",
+      "asset_type": "instagram_media",
+      "title": "9ma 4 KRUMP collaboration T-shirt denim Print Dirty Paint",
+      "template": "night_cta",
+      "story_id": "18362196805242779",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_29926660248_night_cta_18602359075021330.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-07-22T14:04:32.320490Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
