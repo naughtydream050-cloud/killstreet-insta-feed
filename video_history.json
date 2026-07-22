@@ -412,6 +412,23 @@
       "hf_skip_reason": "",
       "instagram_publish_status": "published",
       "github_run_id": "29755103152"
+    },
+    {
+      "story_id": "17936654082322774",
+      "container_id": "18080884988476636",
+      "product_title": "\"どうせイベント前しかセッション来ねぇじゃん\"Buck Print T-shirt",
+      "product_page_url": "https://killstreet2.base.shop/items/141332459",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-07-23_29932734719.mp4",
+      "prepared_date_jst": "2026-07-23",
+      "posted_date_jst": "2026-07-23",
+      "posted_at": "2026-07-22T15:20:04.127Z",
+      "source": "hf_video_auto",
+      "generation_mode": "static_product_video_fallback",
+      "hf_attempted_at": "2026-07-22T15:19:02.795Z",
+      "hf_error": "RuntimeError",
+      "hf_skip_reason": "",
+      "instagram_publish_status": "published",
+      "github_run_id": "29932734719"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
