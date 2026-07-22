@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18114123226849672",
-      "asset_type": "instagram_media",
-      "title": "着ルストリート-KILL STREET-",
-      "template": "morning_worldview",
-      "story_id": "18099190481136815",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_27182684478_morning_worldview_18114123226849672.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-06-09T03:52:38.860093Z"
-    },
-    {
       "asset_id": "17919281058164109",
       "asset_type": "instagram_media",
       "title": "着ルストリート✖︎K.F.B SESSION k.f.b_session ",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_29836951261_night_cta_18051643493562741.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-07-21T13:59:53.777143Z"
+    },
+    {
+      "asset_id": "18141661051527263",
+      "asset_type": "instagram_media",
+      "title": "\"どうせイベント前しかセッション来ねぇじゃん\"Buck Print T-shirt",
+      "template": "morning_worldview",
+      "story_id": "18000933689970675",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_29886964763_morning_worldview_18141661051527263.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-07-22T02:53:32.490559Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
