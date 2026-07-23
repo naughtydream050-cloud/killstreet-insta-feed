@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18050533766780734",
-      "asset_type": "instagram_media",
-      "title": "Trompe l'oeil Full Print KILLSTREET Signature Pullover Hoodie",
-      "template": "morning_worldview",
-      "story_id": "18591144616032281",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_27252319323_morning_worldview_18050533766780734.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-06-10T04:03:54.853223Z"
-    },
-    {
       "asset_id": "17919281058164109",
       "asset_type": "instagram_media",
       "title": "着ルストリート✖︎K.F.B SESSION k.f.b_session ",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_29926660248_night_cta_18602359075021330.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-07-22T14:04:32.320490Z"
+    },
+    {
+      "asset_id": "18051643493562741",
+      "asset_type": "instagram_media",
+      "title": "K.F.B SESSION collaboration Tshirt\"RUDE DOGZ\"",
+      "template": "morning_worldview",
+      "story_id": "18089119727566661",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_29976475583_morning_worldview_18051643493562741.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-07-23T03:14:59.394804Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
