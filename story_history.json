@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18112904737869275",
-      "asset_type": "instagram_media",
-      "title": "Classic \"喋りすぎ NO TALK\" Buck T-Shirt",
-      "template": "morning_worldview",
-      "story_id": "17969008227064796",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_27451464563_morning_worldview_18112904737869275.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-06-13T00:50:28.784192Z"
-    },
-    {
       "asset_id": "18050533766780734",
       "asset_type": "instagram_media",
       "title": "Trompe l'oeil Full Print KILLSTREET Signature Pullover Hoodie",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30079201755_afternoon_product_18051643493562741.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-07-24T08:31:54.681361Z"
+    },
+    {
+      "asset_id": "18141661051527263",
+      "asset_type": "instagram_media",
+      "title": "\"どうせイベント前しかセッション来ねぇじゃん\"Buck Print T-shirt",
+      "template": "night_cta",
+      "story_id": "17978365862997042",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30098502832_night_cta_18141661051527263.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-07-24T13:51:46.676995Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
