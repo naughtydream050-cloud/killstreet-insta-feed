@@ -446,6 +446,23 @@
       "hf_skip_reason": "",
       "instagram_publish_status": "published",
       "github_run_id": "30104221001"
+    },
+    {
+      "story_id": "17960830800141373",
+      "container_id": "18081470606476636",
+      "product_title": "9ma 4 KRUMP collaboration T-shirt denim Print Dirty Paint",
+      "product_page_url": "https://killstreet2.base.shop/items/146635756",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-07-26_30206787554.mp4",
+      "prepared_date_jst": "2026-07-26",
+      "posted_date_jst": "2026-07-26",
+      "posted_at": "2026-07-26T14:47:58.617Z",
+      "source": "hf_video_auto",
+      "generation_mode": "static_product_video_fallback",
+      "hf_attempted_at": "2026-07-26T14:47:01.521Z",
+      "hf_error": "RuntimeError",
+      "hf_skip_reason": "",
+      "instagram_publish_status": "published",
+      "github_run_id": "30206787554"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
