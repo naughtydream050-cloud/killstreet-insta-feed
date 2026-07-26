@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "17919281058164109",
-      "asset_type": "instagram_media",
-      "title": "着ルストリート✖︎K.F.B SESSION @k.f.b_session ",
-      "template": "night_cta",
-      "story_id": "17935612887275863",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_27501413485_night_cta_17919281058164109.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-06-14T14:11:15.166379Z"
-    },
-    {
       "asset_id": "18056485679743075",
       "asset_type": "instagram_media",
       "title": "Original Hand Towel Bandana \"一念通天\"",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30194717689_afternoon_product_18141661051527263.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-07-26T08:30:55.388470Z"
+    },
+    {
+      "asset_id": "18129206458623032",
+      "asset_type": "instagram_media",
+      "title": "BUCK PANTS KRUMP TERMINOLOGY PRINT Dirty-Processed Paint",
+      "template": "night_cta",
+      "story_id": "17924185098161859",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30204358814_night_cta_18129206458623032.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-07-26T13:36:31.861414Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
