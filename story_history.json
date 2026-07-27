@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "17919281058164109",
-      "asset_type": "instagram_media",
-      "title": "着ルストリート✖︎K.F.B SESSION @k.f.b_session ",
-      "template": "morning_worldview",
-      "story_id": "18297385711304379",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_27594760489_morning_worldview_17919281058164109.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-06-16T04:46:19.920850Z"
-    },
-    {
       "asset_id": "18056485679743075",
       "asset_type": "instagram_media",
       "title": "Original Hand Towel Bandana \"一念通天\"",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30256051081_afternoon_product_18051643493562741.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-07-27T09:57:35.482425Z"
+    },
+    {
+      "asset_id": "18141661051527263",
+      "asset_type": "instagram_media",
+      "title": "\"どうせイベント前しかセッション来ねぇじゃん\"Buck Print T-shirt",
+      "template": "night_cta",
+      "story_id": "18101279843465058",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30276345628_night_cta_18141661051527263.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-07-27T14:42:52.819460Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
