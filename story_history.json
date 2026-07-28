@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18112904737869275",
-      "asset_type": "instagram_media",
-      "title": "Classic \"喋りすぎ NO TALK\" Buck T-Shirt",
-      "template": "morning_worldview",
-      "story_id": "18119368705773354",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_27665712374_morning_worldview_18112904737869275.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-06-17T04:26:22.820245Z"
-    },
-    {
       "asset_id": "17919281058164109",
       "asset_type": "instagram_media",
       "title": "着ルストリート✖︎K.F.B SESSION @k.f.b_session ",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30343217935_afternoon_product_18602359075021330.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-07-28T08:39:41.652347Z"
+    },
+    {
+      "asset_id": "18051643493562741",
+      "asset_type": "instagram_media",
+      "title": "K.F.B SESSION collaboration Tshirt\"RUDE DOGZ\"",
+      "template": "night_cta",
+      "story_id": "17918074575411547",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30367300593_night_cta_18051643493562741.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-07-28T14:14:17.287860Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
