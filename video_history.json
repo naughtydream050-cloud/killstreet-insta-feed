@@ -463,6 +463,23 @@
       "hf_skip_reason": "",
       "instagram_publish_status": "published",
       "github_run_id": "30206787554"
+    },
+    {
+      "story_id": "18097850078201309",
+      "container_id": "18081763010476636",
+      "product_title": "Classic \"喋りすぎ NO TALK\" Buck T-Shirt",
+      "product_page_url": "https://killstreet2.base.shop/items/138177407",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-07-29_30374547378.mp4",
+      "prepared_date_jst": "2026-07-29",
+      "posted_date_jst": "2026-07-29",
+      "posted_at": "2026-07-28T15:42:14.010Z",
+      "source": "hf_video_auto",
+      "generation_mode": "static_product_video_fallback",
+      "hf_attempted_at": "2026-07-28T15:41:12.573Z",
+      "hf_error": "RuntimeError",
+      "hf_skip_reason": "",
+      "instagram_publish_status": "published",
+      "github_run_id": "30374547378"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
