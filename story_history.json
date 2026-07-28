@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18056485679743075",
-      "asset_type": "instagram_media",
-      "title": "Original Hand Towel Bandana \"一念通天\"",
-      "template": "afternoon_product",
-      "story_id": "18105094592512859",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_27613758616_afternoon_product_18056485679743075.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-06-16T11:19:18.324301Z"
-    },
-    {
       "asset_id": "17893675524490361",
       "asset_type": "instagram_media",
       "title": "Trompe l'oeil Full Print KILLSTREET Signature Pullover Hoodie",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30276345628_night_cta_18141661051527263.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-07-27T14:42:52.819460Z"
+    },
+    {
+      "asset_id": "18129206458623032",
+      "asset_type": "instagram_media",
+      "title": "BUCK PANTS KRUMP TERMINOLOGY PRINT Dirty-Processed Paint",
+      "template": "morning_worldview",
+      "story_id": "18076007114504089",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30323986895_morning_worldview_18129206458623032.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-07-28T02:45:45.140140Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
