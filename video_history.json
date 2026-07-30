@@ -480,6 +480,23 @@
       "hf_skip_reason": "",
       "instagram_publish_status": "published",
       "github_run_id": "30374547378"
+    },
+    {
+      "story_id": "18171964873428479",
+      "container_id": "18082067252476636",
+      "product_title": "KILLSTREET✖︎BUCK UP collaboration T-shirt",
+      "product_page_url": "https://killstreet2.base.shop/items/152395030",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-07-31_30556882923.mp4",
+      "prepared_date_jst": "2026-07-31",
+      "posted_date_jst": "2026-07-31",
+      "posted_at": "2026-07-30T15:30:29.848Z",
+      "source": "hf_video_auto",
+      "generation_mode": "static_product_video_fallback",
+      "hf_attempted_at": "2026-07-30T15:29:27.799Z",
+      "hf_error": "RuntimeError",
+      "hf_skip_reason": "",
+      "instagram_publish_status": "published",
+      "github_run_id": "30556882923"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
