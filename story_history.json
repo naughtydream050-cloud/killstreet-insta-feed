@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18098542058231367",
-      "asset_type": "instagram_media",
-      "title": "9ma 4 KRUMP collaboration T-shirt",
-      "template": "afternoon_product",
-      "story_id": "18592640626013736",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_27820975426_afternoon_product_18098542058231367.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-06-19T10:43:45.084174Z"
-    },
-    {
       "asset_id": "17893675524490361",
       "asset_type": "instagram_media",
       "title": "Trompe l'oeil Full Print KILLSTREET Signature Pullover Hoodie",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30550276712_night_cta_18602359075021330.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-07-30T14:09:46.455492Z"
+    },
+    {
+      "asset_id": "18051643493562741",
+      "asset_type": "instagram_media",
+      "title": "K.F.B SESSION collaboration Tshirt\"RUDE DOGZ\"",
+      "template": "morning_worldview",
+      "story_id": "18124711486785761",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30601229481_morning_worldview_18051643493562741.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-07-31T03:18:51.689158Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
