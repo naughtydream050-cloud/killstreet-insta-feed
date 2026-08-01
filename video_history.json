@@ -497,6 +497,23 @@
       "hf_skip_reason": "",
       "instagram_publish_status": "published",
       "github_run_id": "30556882923"
+    },
+    {
+      "story_id": "18127027045579378",
+      "container_id": "18082362824476636",
+      "product_title": "VINTAGE-Processed \"ワルモノ\" T-shirt",
+      "product_page_url": "https://killstreet2.base.shop/items/137814369",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-08-01_30704328111.mp4",
+      "prepared_date_jst": "2026-08-01",
+      "posted_date_jst": "2026-08-01",
+      "posted_at": "2026-08-01T14:44:35.451Z",
+      "source": "hf_video_auto",
+      "generation_mode": "static_product_video_fallback",
+      "hf_attempted_at": "2026-08-01T14:43:00.995Z",
+      "hf_error": "RuntimeError",
+      "hf_skip_reason": "",
+      "instagram_publish_status": "published",
+      "github_run_id": "30704328111"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
