@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18056485679743075",
-      "asset_type": "instagram_media",
-      "title": "Original Hand Towel Bandana \"一念通天\"",
-      "template": "afternoon_product",
-      "story_id": "18125031010566551",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_27866862029_afternoon_product_18056485679743075.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-06-20T09:22:37.468524Z"
-    },
-    {
       "asset_id": "18098542058231367",
       "asset_type": "instagram_media",
       "title": "9ma 4 KRUMP collaboration T-shirt",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30637736064_night_cta_18602359075021330.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-07-31T14:15:04.042345Z"
+    },
+    {
+      "asset_id": "18129206458623032",
+      "asset_type": "instagram_media",
+      "title": "BUCK PANTS KRUMP TERMINOLOGY PRINT Dirty-Processed Paint",
+      "template": "morning_worldview",
+      "story_id": "18096204470365547",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30681679719_morning_worldview_18129206458623032.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-08-01T03:17:29.260673Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
