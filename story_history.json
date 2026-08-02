@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18098542058231367",
-      "asset_type": "instagram_media",
-      "title": "9ma 4 KRUMP collaboration T-shirt",
-      "template": "night_cta",
-      "story_id": "18593306638044962",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_27907153674_night_cta_18098542058231367.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-06-21T14:19:19.335136Z"
-    },
-    {
       "asset_id": "18117668137829584",
       "asset_type": "instagram_media",
       "title": "Full Design KRUMP Terminology BUCK T-shirt",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30730350916_morning_worldview_18602359075021330.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-08-02T03:17:46.514357Z"
+    },
+    {
+      "asset_id": "18051643493562741",
+      "asset_type": "instagram_media",
+      "title": "K.F.B SESSION collaboration Tshirt\"RUDE DOGZ\"",
+      "template": "afternoon_product",
+      "story_id": "18211411096346382",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30739813549_afternoon_product_18051643493562741.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-08-02T08:28:26.213178Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
