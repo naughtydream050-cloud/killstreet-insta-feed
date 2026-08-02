@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18117668137829584",
-      "asset_type": "instagram_media",
-      "title": "Full Design KRUMP Terminology BUCK T-shirt",
-      "template": "morning_worldview",
-      "story_id": "18419823826182023",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_27930255589_morning_worldview_18117668137829584.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-06-22T04:48:56.513076Z"
-    },
-    {
       "asset_id": "18056485679743075",
       "asset_type": "instagram_media",
       "title": "Original Hand Towel Bandana \"一念通天\"",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30739813549_afternoon_product_18051643493562741.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-08-02T08:28:26.213178Z"
+    },
+    {
+      "asset_id": "18129206458623032",
+      "asset_type": "instagram_media",
+      "title": "BUCK PANTS KRUMP TERMINOLOGY PRINT Dirty-Processed Paint",
+      "template": "night_cta",
+      "story_id": "17939250309296780",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30749961684_night_cta_18129206458623032.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-08-02T13:28:14.434284Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
