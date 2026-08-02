@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18056485679743075",
-      "asset_type": "instagram_media",
-      "title": "Original Hand Towel Bandana \"一念通天\"",
-      "template": "afternoon_product",
-      "story_id": "18084213029539834",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_27900690257_afternoon_product_18056485679743075.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-06-21T09:55:46.698152Z"
-    },
-    {
       "asset_id": "18098542058231367",
       "asset_type": "instagram_media",
       "title": "9ma 4 KRUMP collaboration T-shirt",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30701743392_night_cta_18141661051527263.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-08-01T13:27:57.772740Z"
+    },
+    {
+      "asset_id": "18602359075021330",
+      "asset_type": "instagram_media",
+      "title": "9ma 4 KRUMP collaboration T-shirt denim Print Dirty Paint",
+      "template": "morning_worldview",
+      "story_id": "18108127796281190",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30730350916_morning_worldview_18602359075021330.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-08-02T03:17:46.514357Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
