@@ -531,6 +531,23 @@
       "hf_skip_reason": "",
       "instagram_publish_status": "published",
       "github_run_id": "30830088138"
+    },
+    {
+      "story_id": "18093532313525656",
+      "container_id": "18082978676476636",
+      "product_title": "\"生-Raw-\" Print Running Script Processed T-Shirt",
+      "product_page_url": "https://killstreet2.base.shop/items/137856068",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-08-06_31021057888.mp4",
+      "prepared_date_jst": "2026-08-06",
+      "posted_date_jst": "2026-08-06",
+      "posted_at": "2026-08-05T15:37:10.121Z",
+      "source": "hf_video_auto",
+      "generation_mode": "static_product_video_fallback",
+      "hf_attempted_at": "2026-08-05T15:36:07.829Z",
+      "hf_error": "RuntimeError",
+      "hf_skip_reason": "",
+      "instagram_publish_status": "published",
+      "github_run_id": "31021057888"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
