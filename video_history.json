@@ -548,6 +548,23 @@
       "hf_skip_reason": "",
       "instagram_publish_status": "published",
       "github_run_id": "31021057888"
+    },
+    {
+      "story_id": "18186639376395154",
+      "container_id": "18083264102476636",
+      "product_title": "\"KILLSTREET\" Distressed Trompe l&#039;oeil Denim T-Shirt",
+      "product_page_url": "https://killstreet2.base.shop/items/137873781",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-08-07_31187868333.mp4",
+      "prepared_date_jst": "2026-08-07",
+      "posted_date_jst": "2026-08-07",
+      "posted_at": "2026-08-07T14:31:56.528Z",
+      "source": "hf_video_auto",
+      "generation_mode": "static_product_video_fallback",
+      "hf_attempted_at": "2026-08-07T14:30:34.949Z",
+      "hf_error": "RuntimeError",
+      "hf_skip_reason": "",
+      "instagram_publish_status": "published",
+      "github_run_id": "31187868333"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
