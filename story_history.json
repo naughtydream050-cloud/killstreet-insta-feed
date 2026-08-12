@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18098542058231367",
-      "asset_type": "instagram_media",
-      "title": "9ma 4 KRUMP collaboration T-shirt",
-      "template": "morning_worldview",
-      "story_id": "18069211922438094",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_28564120173_morning_worldview_18098542058231367.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-07-02T03:54:07.645167Z"
-    },
-    {
       "asset_id": "18117668137829584",
       "asset_type": "instagram_media",
       "title": "Full Design KRUMP Terminology BUCK T-shirt",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_31574685358_afternoon_product_18051643493562741.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-08-12T07:37:28.133423Z"
+    },
+    {
+      "asset_id": "18065689760554739",
+      "asset_type": "instagram_media",
+      "title": "KILLSTREET✖︎BUCK UP collaboration T-shirt",
+      "template": "night_cta",
+      "story_id": "18102513656148787",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_31600515290_night_cta_18065689760554739.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-08-12T13:16:55.654128Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
