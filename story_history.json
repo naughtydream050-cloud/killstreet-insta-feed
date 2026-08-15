@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18082975670239671",
-      "asset_type": "instagram_media",
-      "title": "BUCK PANTS KRUMP TERMINOLOGY PRINT Dirty-Processed Paint",
-      "template": "afternoon_product",
-      "story_id": "18119447053698391",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_28700841321_afternoon_product_18082975670239671.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-07-04T08:42:14.116564Z"
-    },
-    {
       "asset_id": "18117668137829584",
       "asset_type": "instagram_media",
       "title": "Full Design KRUMP Terminology BUCK T-shirt",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_31803652348_night_cta_18051643493562741.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-08-14T13:13:16.254923Z"
+    },
+    {
+      "asset_id": "18065689760554739",
+      "asset_type": "instagram_media",
+      "title": "KILLSTREET✖︎BUCK UP collaboration T-shirt",
+      "template": "morning_worldview",
+      "story_id": "17863632375662867",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_31856347171_morning_worldview_18065689760554739.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-08-15T01:23:44.551137Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
