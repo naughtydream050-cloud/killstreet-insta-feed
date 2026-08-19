@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18129206458623032",
-      "asset_type": "instagram_media",
-      "title": "BUCK PANTS KRUMP TERMINOLOGY PRINT Dirty-Processed Paint",
-      "template": "night_cta",
-      "story_id": "17921602275393511",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_29028833930_night_cta_18129206458623032.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-07-09T15:17:34.978268Z"
-    },
-    {
       "asset_id": "18082975670239671",
       "asset_type": "instagram_media",
       "title": "BUCK PANTS KRUMP TERMINOLOGY PRINT Dirty-Processed Paint",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_32139079350_night_cta_18065689760554739.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-08-18T12:53:05.017925Z"
+    },
+    {
+      "asset_id": "18602359075021330",
+      "asset_type": "instagram_media",
+      "title": "9ma 4 KRUMP collaboration T-shirt denim Print Dirty Paint",
+      "template": "morning_worldview",
+      "story_id": "18145022602543858",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_32204735662_morning_worldview_18602359075021330.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-08-19T01:24:05.228285Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
