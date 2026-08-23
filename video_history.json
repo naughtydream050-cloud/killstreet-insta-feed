@@ -684,6 +684,23 @@
       "hf_skip_reason": "",
       "instagram_publish_status": "published",
       "github_run_id": "32490184511"
+    },
+    {
+      "story_id": "17926883298404960",
+      "container_id": "18085689392476636",
+      "product_title": "K.F.B SESSION collaboration Tshirt\"RUDE DOGZ\"",
+      "product_page_url": "https://killstreet2.base.shop/items/145779177",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-08-23_32643598939.mp4",
+      "prepared_date_jst": "2026-08-23",
+      "posted_date_jst": "2026-08-23",
+      "posted_at": "2026-08-23T13:52:27.102Z",
+      "source": "hf_video_auto",
+      "generation_mode": "static_product_video_fallback",
+      "hf_attempted_at": "2026-08-23T13:51:26.344Z",
+      "hf_error": "RuntimeError",
+      "hf_skip_reason": "",
+      "instagram_publish_status": "published",
+      "github_run_id": "32643598939"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
