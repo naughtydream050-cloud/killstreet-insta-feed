@@ -55,12 +55,16 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          cp posted_history.json /tmp/posted_history.json
+          git fetch origin main
+          git reset --hard origin/main
+          cp /tmp/posted_history.json posted_history.json
           git add posted_history.json
           if git diff --staged --quiet; then
             echo "[HISTORY] No new posts - nothing to commit"
           else
             git commit -m "chore: update posted_history.json [skip ci]"
-            git push
+            git push origin HEAD:main
             echo "[HISTORY] posted_history.json pushed to GitHub"
           fi
 

@@ -318,10 +318,10 @@ def upload_instagram_image_to_github(item, image_bytes):
 
 
 def prepare_instagram_image_url(item, source_url):
-    if DRY_RUN:
-        print("[IG IMAGE][DRY RUN] Would generate and publish 1080x1080 feed-safe image")
-        return source_url
     image_bytes = make_instagram_square_image(source_url, item.get("item_id"))
+    if DRY_RUN:
+        print(f"[IG IMAGE][DRY RUN] Generated feed-safe image bytes={len(image_bytes)}; would publish to GitHub")
+        return source_url
     public_url = upload_instagram_image_to_github(item, image_bytes)
     print(f"[IG IMAGE] using_processed_image_url={public_url}")
     return public_url
