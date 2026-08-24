@@ -9,6 +9,8 @@ import html
 import re
 import requests
 import xml.etree.ElementTree as ET
+from io import BytesIO
+from PIL import Image, ImageOps
 
 # ── Environment variables ─────────────────────────────────────────────────────
 CLIENT_ID     = os.environ.get("BASE_CLIENT_ID", "").strip()
@@ -28,6 +30,8 @@ TEST_ITEMS_FILE   = os.environ.get("TEST_ITEMS_FILE", "").strip()
 FEED_FALLBACK_URL = "https://naughtydream050-cloud.github.io/killstreet-insta-feed/feed.xml"
 BASE_SHOP_URL     = os.environ.get("BASE_SHOP_URL", "https://killstreet2.base.shop/").strip() or "https://killstreet2.base.shop/"
 STORY_FALLBACK_ASSETS_FILE = os.environ.get("STORY_FALLBACK_ASSETS_FILE", "story_fallback_assets.json").strip() or "story_fallback_assets.json"
+IG_IMAGE_BRANCH = os.environ.get("IG_IMAGE_BRANCH", "main").strip() or "main"
+IG_IMAGE_DIR = os.environ.get("IG_IMAGE_DIR", "docs/ig-feed/generated").strip().strip("/") or "docs/ig-feed/generated"
 
 
 class BaseApiError(RuntimeError):
@@ -36,6 +40,16 @@ class BaseApiError(RuntimeError):
 
 def short_response_text(resp, limit=500):
     return (resp.text or "").replace("\n", "\\n")[:limit]
+
+
+def github_headers():
+    if not GH_PAT_SECRETS:
+        return None
+    return {
+        "Authorization": f"Bearer {GH_PAT_SECRETS}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
 
 
 def apply_cli_overrides():
@@ -231,6 +245,86 @@ def _get_image_url(item):
     else:
         print(f"[IMG] id={item_id} -> no image URL found. Available keys: {[k for k in item.keys() if 'img' in k.lower() or 'image' in k.lower()]}")
     return fallback
+
+
+def make_instagram_square_image(image_url, item_id):
+    print(f"[IG IMAGE] Preparing square image for item_id={item_id}")
+    response = requests.get(image_url, timeout=60)
+    if response.status_code != 200:
+        raise RuntimeError(f"Image download failed: HTTP {response.status_code}")
+
+    with Image.open(BytesIO(response.content)) as img:
+        img = ImageOps.exif_transpose(img).convert("RGB")
+        original_w, original_h = img.size
+        canvas_size = 1080
+        canvas = Image.new("RGB", (canvas_size, canvas_size), (0, 0, 0))
+        img.thumbnail((canvas_size, canvas_size), Image.Resampling.LANCZOS)
+        x = (canvas_size - img.width) // 2
+        y = (canvas_size - img.height) // 2
+        canvas.paste(img, (x, y))
+
+    out = BytesIO()
+    canvas.save(out, format="JPEG", quality=92, optimize=True)
+    data = out.getvalue()
+    print(f"[IG IMAGE] source_size={original_w}x{original_h} output=1080x1080 bytes={len(data)}")
+    return data
+
+
+def github_content_sha(repo_path):
+    headers = github_headers()
+    if not headers:
+        return None
+    resp = requests.get(
+        f"https://api.github.com/repos/{GH_REPO}/contents/{repo_path}",
+        headers=headers,
+        params={"ref": IG_IMAGE_BRANCH},
+        timeout=30,
+    )
+    if resp.status_code == 200:
+        return resp.json().get("sha")
+    if resp.status_code == 404:
+        return None
+    print(f"[IG IMAGE] Existing content lookup failed: HTTP {resp.status_code} -> {short_response_text(resp, 200)}")
+    return None
+
+
+def upload_instagram_image_to_github(item, image_bytes):
+    headers = github_headers()
+    if not headers:
+        raise RuntimeError("GH_PAT_SECRETS is required to publish processed Instagram image")
+
+    key = re.sub(r"[^0-9A-Za-z_-]+", "_", item_key(item) or str(item.get("item_id") or "product"))
+    repo_path = f"{IG_IMAGE_DIR}/ig_feed_{key}.jpg"
+    payload = {
+        "message": f"chore: update Instagram feed image {key} [skip ci]",
+        "content": base64.b64encode(image_bytes).decode("ascii"),
+        "branch": IG_IMAGE_BRANCH,
+    }
+    sha = github_content_sha(repo_path)
+    if sha:
+        payload["sha"] = sha
+
+    resp = requests.put(
+        f"https://api.github.com/repos/{GH_REPO}/contents/{repo_path}",
+        headers=headers,
+        json=payload,
+        timeout=60,
+    )
+    print(f"[IG IMAGE] Upload processed image: HTTP {resp.status_code} path={repo_path}")
+    if resp.status_code not in (200, 201):
+        raise RuntimeError(f"Processed image upload failed: HTTP {resp.status_code} -> {short_response_text(resp, 300)}")
+
+    return f"https://raw.githubusercontent.com/{GH_REPO}/{IG_IMAGE_BRANCH}/{repo_path}"
+
+
+def prepare_instagram_image_url(item, source_url):
+    if DRY_RUN:
+        print("[IG IMAGE][DRY RUN] Would generate and publish 1080x1080 feed-safe image")
+        return source_url
+    image_bytes = make_instagram_square_image(source_url, item.get("item_id"))
+    public_url = upload_instagram_image_to_github(item, image_bytes)
+    print(f"[IG IMAGE] using_processed_image_url={public_url}")
+    return public_url
 
 
 # ── BASE item fetching ────────────────────────────────────────────────────────
@@ -561,13 +655,21 @@ def ig_post(item):
     caption  = f"{title}\n\n\u00a5{price:,}\n\n{item_url}\n\n#killstreet #streetwear"
 
     print(f"[IG] title={title[:40]!r}")
-    print(f"[IG] image_url={img_url}")
+    print(f"[IG] source_image_url={img_url}")
     print(f"[IG] caption preview: {caption[:80]!r}")
     print(f"[IG] DRY_RUN={DRY_RUN} | IG_USER_ID={IG_USER_ID[:6]}... | IG_TOKEN set={bool(IG_TOKEN)}")
 
     if DRY_RUN:
+        prepare_instagram_image_url(item, img_url)
         print(f"[DRY RUN] Skipping actual post (dry run mode)")
         return True
+
+    try:
+        img_url = prepare_instagram_image_url(item, img_url)
+    except Exception as e:
+        print(f"[IG ERROR] Feed-safe image preparation failed: {e}")
+        traceback.print_exc()
+        return False
 
     # Step 1: Create media container
     print("[IG] Step 1: Creating media container...")

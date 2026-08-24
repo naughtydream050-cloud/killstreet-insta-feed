@@ -130,6 +130,48 @@ function shortText(value, max = 800) {
   return String(value || "").slice(0, max);
 }
 
+function sanitizeLogText(value) {
+  let text = String(value || "");
+  for (const secret of [HF_TOKEN, IG_TOKEN]) {
+    if (secret) {
+      text = text.split(secret).join("***");
+    }
+  }
+  return text;
+}
+
+function formatError(error) {
+  const parts = [];
+  if (error?.name) {
+    parts.push(`name=${error.name}`);
+  }
+  if (error?.message) {
+    parts.push(`message=${error.message}`);
+  }
+  if (error?.stack) {
+    parts.push(`stack=${String(error.stack).split("\n").slice(0, 4).join(" | ")}`);
+  }
+  if (error?.cause) {
+    parts.push(`cause=${formatError(error.cause)}`);
+  }
+  try {
+    const plain = {};
+    for (const key of Object.keys(error || {})) {
+      const value = error[key];
+      if (typeof value !== "function") {
+        plain[key] = value;
+      }
+    }
+    const json = JSON.stringify(plain);
+    if (json && json !== "{}") {
+      parts.push(`props=${json}`);
+    }
+  } catch {
+    // Ignore non-serializable error properties.
+  }
+  return sanitizeLogText(parts.join(" | ") || String(error));
+}
+
 async function fetchBuffer(url) {
   const response = await fetch(url);
   if (!response.ok) {
@@ -469,7 +511,7 @@ async function prepare() {
         await generateHfVideo(inputImage, rawVideo);
         await renderStoryVideo(rawVideo, storyVideo, path.join(WORK_DIR, `${baseName}_text`), product.product_title);
       } catch (error) {
-        hfError = error?.message || String(error);
+        hfError = formatError(error);
         console.log(`[AI VIDEO][WARN] HF generation failed: ${shortText(hfError, 500)}`);
         if (!VIDEO_FALLBACK_STATIC) {
           throw error;
