@@ -701,6 +701,23 @@
       "hf_skip_reason": "",
       "instagram_publish_status": "published",
       "github_run_id": "32643598939"
+    },
+    {
+      "story_id": "18104527211589437",
+      "container_id": "18085956890476636",
+      "product_title": "9ma 4 KRUMP collaboration T-shirt denim Print Dirty Paint",
+      "product_page_url": "https://killstreet2.base.shop/items/146635756",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-08-25_32857901338.mp4",
+      "prepared_date_jst": "2026-08-25",
+      "posted_date_jst": "2026-08-25",
+      "posted_at": "2026-08-25T14:13:41.889Z",
+      "source": "hf_video_auto",
+      "generation_mode": "static_product_video_fallback",
+      "hf_attempted_at": "2026-08-25T14:11:33.651Z",
+      "hf_error": "name=Error | message=RuntimeError | stack=Error: RuntimeError |     at Client.predict (file:///home/runner/work/killstreet-insta-feed/killstreet-insta-feed/node_modules/@gradio/client/dist/index.js:886:19) |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) |     at async generateHfVideo (file:///home/runner/work/killstreet-insta-feed/killstreet-insta-feed/scripts/video_ai_story_auto.mjs:377:18) | props={\"type\":\"status\",\"endpoint\":\"/generate_video\",\"fn_index\":2,\"time\":\"2026-08-25T14:11:41.062Z\",\"queue\":true,\"title\":\"ZeroGPU worker error\",\"visible\":true,\"duration\":10,\"stage\":\"error\",\"success\":false}",
+      "hf_skip_reason": "",
+      "instagram_publish_status": "published",
+      "github_run_id": "32857901338"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
