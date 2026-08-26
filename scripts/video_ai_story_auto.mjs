@@ -28,9 +28,9 @@ const PRODUCT_PAGE_URL_OVERRIDE = process.env.VIDEO_PRODUCT_PAGE_URL || "";
 const PRODUCT_LIST_URL = process.env.VIDEO_PRODUCT_LIST_URL || "https://killstreet2.base.shop/";
 const PRODUCT_IMAGE_URL = process.env.VIDEO_PRODUCT_IMAGE_URL || "";
 
-const SPACE = process.env.HF_VIDEO_SPACE || "multimodalart/Wan2.1-Fast";
-const SPACE_URL = process.env.HF_VIDEO_SPACE_URL || "https://multimodalart-wan2-1-fast.hf.space";
-const ENDPOINT = process.env.HF_VIDEO_ENDPOINT || "/generate_video";
+const LEGACY_SPACE = process.env.HF_VIDEO_SPACE || "multimodalart/Wan2.1-Fast";
+const LEGACY_SPACE_URL = process.env.HF_VIDEO_SPACE_URL || "https://multimodalart-wan2-1-fast.hf.space";
+const LEGACY_ENDPOINT = process.env.HF_VIDEO_ENDPOINT || "/generate_video";
 
 const ROOT = process.cwd();
 const OUT_DIR = path.join(ROOT, "docs", "story", "generated");
@@ -44,6 +44,8 @@ const PROMPT =
 const NEGATIVE_PROMPT =
   process.env.HF_VIDEO_NEGATIVE_PROMPT ||
   "distorted clothing print, unreadable text, warped letters, changed graphic, new patterns, extra logos, deformed arms, deformed hands, strong body movement, fast walk, spinning, camera shake";
+
+const HF_SPACE_CONFIGS = parseHfSpaceConfigs(process.env.HF_VIDEO_SPACES_JSON);
 
 function utcNow() {
   return new Date();
@@ -70,11 +72,89 @@ function writeJson(file, data) {
   fs.writeFileSync(file, JSON.stringify(data, null, 2) + "\n", "utf8");
 }
 
+function defaultHfSpaceConfigs() {
+  return [
+    {
+      id: "wan21_fast_primary",
+      label: "primary",
+      space: LEGACY_SPACE,
+      url: LEGACY_SPACE_URL,
+      endpoint: LEGACY_ENDPOINT,
+      args: "wan_fast_dimensions",
+      height: 896,
+      width: 512,
+      duration: 3.2,
+      guidance: 1.0,
+      steps: 4,
+      retry: {
+        duration: 2.0,
+        steps: 2,
+        height: 768,
+        width: 448,
+      },
+    },
+    {
+      id: "wan22_aoti_image_secondary",
+      label: "secondary",
+      space: "zerogpu-aoti/wan2-2-fp8da-aoti-image",
+      url: "https://zerogpu-aoti-wan2-2-fp8da-aoti-image.hf.space",
+      endpoint: "/generate_video",
+      args: "wan_fast_auto_resize",
+      duration: 2.0,
+      guidance: 1.0,
+      steps: 4,
+      retry: {
+        duration: 1.4,
+        steps: 2,
+      },
+    },
+  ];
+}
+
+function numberOrDefault(value, fallback) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function normalizeHfSpaceConfig(config, index) {
+  const fallback = defaultHfSpaceConfigs()[Math.min(index, defaultHfSpaceConfigs().length - 1)];
+  return {
+    ...fallback,
+    ...config,
+    id: String(config?.id || fallback.id || `hf_space_${index + 1}`).replace(/[^a-zA-Z0-9_-]/g, "_"),
+    label: String(config?.label || fallback.label || `candidate_${index + 1}`),
+    space: String(config?.space || fallback.space),
+    url: String(config?.url || fallback.url).replace(/\/$/, ""),
+    endpoint: String(config?.endpoint || fallback.endpoint || "/generate_video"),
+    args: String(config?.args || fallback.args || "wan_fast_dimensions"),
+    height: numberOrDefault(config?.height, fallback.height),
+    width: numberOrDefault(config?.width, fallback.width),
+    duration: numberOrDefault(config?.duration, fallback.duration),
+    guidance: numberOrDefault(config?.guidance, fallback.guidance),
+    steps: numberOrDefault(config?.steps, fallback.steps),
+    retry: {
+      ...(fallback.retry || {}),
+      ...(config?.retry || {}),
+    },
+  };
+}
+
+function parseHfSpaceConfigs(rawJson) {
+  if (!rawJson) {
+    return defaultHfSpaceConfigs().map(normalizeHfSpaceConfig);
+  }
+  const parsed = JSON.parse(rawJson);
+  if (!Array.isArray(parsed) || !parsed.length) {
+    throw new Error("HF_VIDEO_SPACES_JSON must be a non-empty JSON array");
+  }
+  return parsed.map(normalizeHfSpaceConfig);
+}
+
 function initialVideoHistory() {
   return {
     videos: [],
     _comment: "Automatically maintained by GitHub Actions. AI video story posting history only.",
-    _schema: "posted stories generated from AI video; HF attempts are recorded when generation is attempted",
+    _schema: "AI video Story history; hf_attempted_at is set only when HF generation API is called",
   };
 }
 
@@ -103,8 +183,14 @@ function updateVideoHistory(payload, fields = {}) {
     source: "hf_video_auto",
     generation_mode: payload.settings?.generation_mode || "unknown",
     hf_attempted_at: payload.settings?.hf_attempted_at || "",
+    hf_status: payload.settings?.hf_status || "",
+    hf_error_type: payload.settings?.hf_error_type || "",
+    hf_selected_space: payload.settings?.hf_selected_space || "",
+    hf_attempt_count: payload.settings?.hf_attempt_count || 0,
+    hf_attempts: payload.settings?.hf_attempts || [],
     hf_error: payload.settings?.hf_error || "",
     hf_skip_reason: payload.settings?.hf_skip_reason || "",
+    story_status: payload.settings?.story_status || "",
     instagram_publish_status: "not_attempted",
     github_run_id: runId,
   };
@@ -170,6 +256,48 @@ function formatError(error) {
     // Ignore non-serializable error properties.
   }
   return sanitizeLogText(parts.join(" | ") || String(error));
+}
+
+function classifyHfError(errorText) {
+  const text = String(errorText || "").toLowerCase();
+  if (
+    text.includes("zerogpu quota") ||
+    text.includes("exceeded your zerogpu") ||
+    text.includes("quota") ||
+    text.includes("requested vs") ||
+    text.includes("no gpu was available")
+  ) {
+    return "quota_exceeded";
+  }
+  if (
+    text.includes("zerogpu worker error") ||
+    text.includes("worker error") ||
+    text.includes("runtimeerror") ||
+    text.includes('"stage":"error"')
+  ) {
+    return "worker_error";
+  }
+  if (text.includes("401") || text.includes("403") || text.includes("unauthorized") || text.includes("forbidden")) {
+    return "auth_error";
+  }
+  return "generation_failed";
+}
+
+function redactedAttempt(attempt) {
+  return {
+    space: attempt.space,
+    label: attempt.label,
+    endpoint: attempt.endpoint,
+    attempt_type: attempt.attempt_type,
+    duration: attempt.duration,
+    steps: attempt.steps,
+    height: attempt.height || null,
+    width: attempt.width || null,
+    status: attempt.status,
+    error_type: attempt.error_type || "",
+    error: attempt.error ? shortText(attempt.error, 500) : "",
+    attempted_at: attempt.attempted_at,
+  };
 }
 
 async function fetchBuffer(url) {
@@ -370,33 +498,154 @@ function overlayFilters(files, inputLabel = "base") {
   ];
 }
 
-async function generateHfVideo(inputImage, rawVideo) {
-  const inputBytes = await readFile(inputImage);
-  const imageBlob = new Blob([inputBytes], { type: "image/jpeg" });
-  const app = await Client.connect(SPACE_URL, HF_TOKEN ? { token: HF_TOKEN } : undefined);
-  const result = await app.predict(ENDPOINT, [
+function hfAttemptSettings(config, retry = false) {
+  const retryConfig = retry ? config.retry || {} : {};
+  return {
+    height: numberOrDefault(retryConfig.height, config.height),
+    width: numberOrDefault(retryConfig.width, config.width),
+    duration: numberOrDefault(retryConfig.duration, config.duration),
+    guidance: numberOrDefault(retryConfig.guidance, config.guidance),
+    steps: numberOrDefault(retryConfig.steps, config.steps),
+  };
+}
+
+function buildPredictArgs(config, imageBlob, settings, seed) {
+  if (config.args === "wan_fast_auto_resize") {
+    return [
+      imageBlob,
+      PROMPT,
+      NEGATIVE_PROMPT,
+      settings.duration,
+      settings.guidance,
+      settings.steps,
+      seed,
+      false,
+    ];
+  }
+  return [
     imageBlob,
     PROMPT,
-    896,
-    512,
+    settings.height,
+    settings.width,
     NEGATIVE_PROMPT,
-    3.2,
-    1.0,
-    4,
-    Math.floor(Date.now() / 1000) % 2147483647,
+    settings.duration,
+    settings.guidance,
+    settings.steps,
+    seed,
     false,
-  ]);
+  ];
+}
+
+async function generateHfVideo(inputImage, rawVideo, config, settings) {
+  const inputBytes = await readFile(inputImage);
+  const imageBlob = new Blob([inputBytes], { type: "image/jpeg" });
+  const app = await Client.connect(config.url, HF_TOKEN ? { token: HF_TOKEN } : undefined);
+  const seed = Math.floor(Date.now() / 1000) % 2147483647;
+  const result = await app.predict(config.endpoint, buildPredictArgs(config, imageBlob, settings, seed));
   const first = result?.data?.[0];
   const video = first?.video || first;
   const videoUrl = video?.url || video?.path;
   if (!videoUrl) {
     throw new Error(`No video URL in HF result: ${shortText(JSON.stringify(result), 500)}`);
   }
-  const response = await fetch(videoUrl, HF_TOKEN ? { headers: { Authorization: `Bearer ${HF_TOKEN}` } } : undefined);
+  const resolvedVideoUrl = String(videoUrl).startsWith("http") ? videoUrl : new URL(videoUrl, `${config.url}/`).toString();
+  const response = await fetch(resolvedVideoUrl, HF_TOKEN ? { headers: { Authorization: `Bearer ${HF_TOKEN}` } } : undefined);
   if (!response.ok) {
     throw new Error(`HF video download failed: HTTP ${response.status}`);
   }
   await writeFile(rawVideo, Buffer.from(await response.arrayBuffer()));
+}
+
+async function attemptHfGeneration(inputImage, rawVideo) {
+  const attempts = [];
+  let firstAttemptedAt = "";
+  let finalError = "";
+  let finalErrorType = "";
+
+  for (const config of HF_SPACE_CONFIGS) {
+    for (const retry of [false, true]) {
+      if (retry) {
+        const previous = attempts[attempts.length - 1];
+        if (previous?.space !== config.space || previous?.error_type !== "worker_error") {
+          break;
+        }
+      }
+
+      const settings = hfAttemptSettings(config, retry);
+      const attemptedAt = isoNow();
+      firstAttemptedAt = firstAttemptedAt || attemptedAt;
+      const attempt = {
+        space: config.space,
+        label: config.label,
+        endpoint: config.endpoint,
+        attempt_type: retry ? "worker_retry_light" : "standard",
+        duration: settings.duration,
+        steps: settings.steps,
+        height: settings.height,
+        width: settings.width,
+        attempted_at: attemptedAt,
+        status: "started",
+      };
+      console.log(
+        `[AI VIDEO] hf_attempt=true space=${config.space} attempt=${attempt.attempt_type} duration=${settings.duration} steps=${settings.steps}`
+      );
+
+      try {
+        await generateHfVideo(inputImage, rawVideo, config, settings);
+        attempt.status = "success";
+        attempts.push(redactedAttempt(attempt));
+        console.log(`[AI VIDEO] hf_generation_success space=${config.space} attempt=${attempt.attempt_type}`);
+        return {
+          ok: true,
+          hf_status: "generation_success",
+          hf_error_type: "",
+          hf_error: "",
+          hf_attempted_at: firstAttemptedAt,
+          hf_selected_space: config.space,
+          hf_attempts: attempts,
+          duration: settings.duration,
+          steps: settings.steps,
+          height: settings.height,
+          width: settings.width,
+          endpoint: config.endpoint,
+        };
+      } catch (error) {
+        const formatted = formatError(error);
+        const errorType = classifyHfError(formatted);
+        attempt.status = "failed";
+        attempt.error_type = errorType;
+        attempt.error = formatted;
+        attempts.push(redactedAttempt(attempt));
+        finalError = formatted;
+        finalErrorType = errorType;
+        console.log(
+          `[AI VIDEO][WARN] hf_generation_failed space=${config.space} attempt=${attempt.attempt_type} error_type=${errorType} error=${shortText(formatted, 500)}`
+        );
+
+        if (errorType === "quota_exceeded" || errorType === "auth_error") {
+          return {
+            ok: false,
+            hf_status: errorType,
+            hf_error_type: errorType,
+            hf_error: formatted,
+            hf_attempted_at: firstAttemptedAt,
+            hf_selected_space: "",
+            hf_attempts: attempts,
+          };
+        }
+      }
+    }
+  }
+
+  return {
+    ok: false,
+    hf_status: finalErrorType || "generation_failed",
+    hf_error_type: finalErrorType || "generation_failed",
+    hf_error: finalError,
+    hf_attempted_at: firstAttemptedAt,
+    hf_selected_space: "",
+    hf_attempts: attempts,
+  };
 }
 
 async function renderStoryVideo(rawVideo, storyVideo, textDir, productTitle) {
@@ -491,38 +740,61 @@ async function prepare() {
   console.log(`[AI VIDEO] product_page_url=${product.product_page_url}`);
   console.log(`[AI VIDEO] product_title=${product.product_title}`);
   console.log(`[AI VIDEO] product_image_url=${product.product_image_url}`);
-  console.log(`[AI VIDEO] hf_space=${SPACE}`);
+  console.log(`[AI VIDEO] hf_space_candidates=${HF_SPACE_CONFIGS.map((config) => config.space).join(",")}`);
 
   let generationMode = "hf_video";
+  let storyStatus = "not_published";
+  let hfStatus = "not_attempted";
+  let hfErrorType = "";
   let hfError = "";
   let hfAttemptedAt = "";
   let hfSkipReason = "";
+  let hfSelectedSpace = "";
+  let hfAttempts = [];
+  let hfDuration = HF_SPACE_CONFIGS[0]?.duration || 3.2;
+  let hfSteps = HF_SPACE_CONFIGS[0]?.steps || 4;
+  let hfHeight = HF_SPACE_CONFIGS[0]?.height || 896;
+  let hfWidth = HF_SPACE_CONFIGS[0]?.width || 512;
+  let hfEndpoint = HF_SPACE_CONFIGS[0]?.endpoint || "/generate_video";
   if (!DRY_RUN) {
     const hfGate = shouldAttemptHf(history);
     if (!hfGate.ok) {
       generationMode = "static_product_video_fallback";
+      hfStatus = "cooldown_skip";
       hfSkipReason = hfGate.reason;
       console.log(`[AI VIDEO] hf_skipped=${hfSkipReason}`);
       await renderFallbackStoryVideo(inputImage, storyVideo, path.join(WORK_DIR, `${baseName}_text`), product.product_title);
     } else {
-      try {
-        hfAttemptedAt = isoNow();
-        console.log(`[AI VIDEO] hf_attempt=true reason=${hfGate.reason}`);
-        await generateHfVideo(inputImage, rawVideo);
+      console.log(`[AI VIDEO] hf_gate=open reason=${hfGate.reason}`);
+      const hfResult = await attemptHfGeneration(inputImage, rawVideo);
+      hfStatus = hfResult.hf_status;
+      hfErrorType = hfResult.hf_error_type;
+      hfError = hfResult.hf_error;
+      hfAttemptedAt = hfResult.hf_attempted_at;
+      hfSelectedSpace = hfResult.hf_selected_space;
+      hfAttempts = hfResult.hf_attempts;
+      hfEndpoint = hfResult.endpoint || hfEndpoint;
+      hfDuration = hfResult.duration || hfDuration;
+      hfSteps = hfResult.steps || hfSteps;
+      hfHeight = hfResult.height || hfHeight;
+      hfWidth = hfResult.width || hfWidth;
+
+      if (hfResult.ok) {
         await renderStoryVideo(rawVideo, storyVideo, path.join(WORK_DIR, `${baseName}_text`), product.product_title);
-      } catch (error) {
-        hfError = formatError(error);
-        console.log(`[AI VIDEO][WARN] HF generation failed: ${shortText(hfError, 500)}`);
+      } else {
         if (!VIDEO_FALLBACK_STATIC) {
-          throw error;
+          throw new Error(`HF generation failed without fallback: ${shortText(hfError, 500)}`);
         }
         generationMode = "static_product_video_fallback";
-        console.log("[AI VIDEO] fallback=static_product_video");
+        console.log(`[AI VIDEO] fallback=static_product_video reason=${hfStatus}`);
         await renderFallbackStoryVideo(inputImage, storyVideo, path.join(WORK_DIR, `${baseName}_text`), product.product_title);
       }
     }
   } else {
     console.log("[AI VIDEO][DRY RUN] generation/render skipped");
+  }
+  if (!DRY_RUN) {
+    storyStatus = generationMode === "hf_video" ? "generation_success" : "fallback_prepared";
   }
 
   const payload = {
@@ -537,15 +809,29 @@ async function prepare() {
     history_file: HISTORY_FILE,
     github_run_id: GITHUB_RUN_ID,
     settings: {
-      space: SPACE,
-      endpoint: ENDPOINT,
-      duration: 3.2,
-      steps: 4,
+      space: hfSelectedSpace || HF_SPACE_CONFIGS[0]?.space || "",
+      endpoint: hfEndpoint,
+      duration: hfDuration,
+      steps: hfSteps,
+      height: hfHeight,
+      width: hfWidth,
       output: "1080x1920 story mp4",
       generation_mode: generationMode,
+      story_status: storyStatus,
+      hf_status: hfStatus,
+      hf_error_type: hfErrorType,
+      hf_selected_space: hfSelectedSpace,
+      hf_attempt_count: hfAttempts.length,
+      hf_attempts: hfAttempts,
       hf_attempted_at: hfAttemptedAt,
       hf_error: hfError,
       hf_skip_reason: hfSkipReason,
+      hf_space_candidates: HF_SPACE_CONFIGS.map((config) => ({
+        label: config.label,
+        space: config.space,
+        endpoint: config.endpoint,
+        args: config.args,
+      })),
       static_fallback_enabled: VIDEO_FALLBACK_STATIC,
       hf_min_hours_between_attempts: HF_MIN_HOURS_BETWEEN_ATTEMPTS,
     },
@@ -632,18 +918,16 @@ async function postPrepared(payloadPath) {
   const storyId = publishJson.id;
   console.log(`[AI VIDEO] SUCCESS story_id=${storyId}`);
 
-  if (payload.settings?.hf_attempted_at) {
-    updateVideoHistory(payload, {
-      story_id: storyId,
-      container_id: containerId,
-      posted_date_jst: payload.posted_date_jst,
-      posted_at: isoNow(),
-      instagram_publish_status: "published",
-    });
-    console.log("[AI VIDEO] video_history_updated=true reason=instagram_publish_success");
-  } else {
-    console.log("[AI VIDEO] video_history_updated=false reason=no_hf_attempt");
-  }
+  const publishStatus = payload.settings?.generation_mode === "hf_video" ? "hf_video_published" : "fallback_published";
+  updateVideoHistory(payload, {
+    story_id: storyId,
+    container_id: containerId,
+    posted_date_jst: payload.posted_date_jst,
+    posted_at: isoNow(),
+    instagram_publish_status: publishStatus,
+    story_status: publishStatus,
+  });
+  console.log(`[AI VIDEO] video_history_updated=true reason=instagram_publish_success story_status=${publishStatus}`);
 }
 
 async function main() {
