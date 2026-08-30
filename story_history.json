@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18051643493562741",
-      "asset_type": "instagram_media",
-      "title": "K.F.B SESSION collaboration Tshirt\"RUDE DOGZ\"",
-      "template": "afternoon_product",
-      "story_id": "17977701243066971",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_29731028614_afternoon_product_18051643493562741.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-07-20T09:20:47.434187Z"
-    },
-    {
       "asset_id": "18141661051527263",
       "asset_type": "instagram_media",
       "title": "\"どうせイベント前しかセッション来ねぇじゃん\"Buck Print T-shirt",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_33309140566_afternoon_product_18065689760554739.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-08-30T11:32:19.737575Z"
+    },
+    {
+      "asset_id": "18141661051527263",
+      "asset_type": "instagram_media",
+      "title": "\"どうせイベント前しかセッション来ねぇじゃん\"Buck Print T-shirt",
+      "template": "night_cta",
+      "story_id": "18068266910743643",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_33322098331_night_cta_18141661051527263.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-08-30T16:19:37.044083Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
