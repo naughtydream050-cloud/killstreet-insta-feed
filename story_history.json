@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18141661051527263",
-      "asset_type": "instagram_media",
-      "title": "\"どうせイベント前しかセッション来ねぇじゃん\"Buck Print T-shirt",
-      "template": "night_cta",
-      "story_id": "18101279843465058",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30276345628_night_cta_18141661051527263.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-07-27T14:42:52.819460Z"
-    },
-    {
       "asset_id": "18129206458623032",
       "asset_type": "instagram_media",
       "title": "BUCK PANTS KRUMP TERMINOLOGY PRINT Dirty-Processed Paint",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_34080363225_morning_worldview_18074197661427549.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-09-07T03:39:58.312043Z"
+    },
+    {
+      "asset_id": "17996852940005695",
+      "asset_type": "instagram_media",
+      "title": "\"KRUMP愛\"COTTON BASIC BUCK T-shirt",
+      "template": "afternoon_product",
+      "story_id": "18138126262610230",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_34119229782_afternoon_product_17996852940005695.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-09-07T11:57:37.522037Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
