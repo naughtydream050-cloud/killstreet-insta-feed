@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18141661051527263",
-      "asset_type": "instagram_media",
-      "title": "\"どうせイベント前しかセッション来ねぇじゃん\"Buck Print T-shirt",
-      "template": "morning_worldview",
-      "story_id": "18418500757148880",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_30417974661_morning_worldview_18141661051527263.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-07-29T02:53:13.834527Z"
-    },
-    {
       "asset_id": "18602359075021330",
       "asset_type": "instagram_media",
       "title": "9ma 4 KRUMP collaboration T-shirt denim Print Dirty Paint",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_34217737709_afternoon_product_18602359075021330.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-09-08T10:53:33.982234Z"
+    },
+    {
+      "asset_id": "18074197661427549",
+      "asset_type": "instagram_media",
+      "title": "Trompe l'oeil Full Print KILLSTREET Signature",
+      "template": "morning_worldview",
+      "story_id": "18115443167287973",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_34308553159_morning_worldview_18074197661427549.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-09-09T03:49:39.089696Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
