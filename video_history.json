@@ -1608,6 +1608,58 @@
       "story_status": "fallback_published",
       "instagram_publish_status": "fallback_published",
       "github_run_id": "35002933854"
+    },
+    {
+      "story_id": "18114683405054734",
+      "container_id": "18089104994476636",
+      "product_title": "\"KRUMP愛\"COTTON BASIC BUCK T-shirt",
+      "product_page_url": "https://killstreet2.base.shop/items/138757915",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-09-17_35129576155.mp4",
+      "prepared_date_jst": "2026-09-17",
+      "posted_date_jst": "2026-09-17",
+      "posted_at": "2026-09-16T17:43:23.044Z",
+      "source": "hf_video_auto",
+      "generation_mode": "static_product_video_fallback",
+      "hf_attempted_at": "2026-09-16T17:40:16.279Z",
+      "hf_status": "generation_failed",
+      "hf_error_type": "generation_failed",
+      "hf_selected_space": "",
+      "hf_attempt_count": 2,
+      "hf_attempts": [
+        {
+          "space": "multimodalart/Wan2.1-Fast",
+          "label": "primary",
+          "endpoint": "/generate_video",
+          "attempt_type": "standard",
+          "duration": 3.2,
+          "steps": 4,
+          "height": 896,
+          "width": 512,
+          "status": "failed",
+          "error_type": "generation_failed",
+          "error": "name=Error | message=Could not resolve app config. (received status 502 when fetching the app config) | stack=Error: Could not resolve app config. (received status 502 when fetching the app config) |     at handleConfigResponse (file:///home/runner/work/killstreet-insta-feed/killstreet-insta-feed/node_modules/@gradio/client/dist/index.js:123:8) |     at Client.resolve_config (file:///home/runner/work/killstreet-insta-feed/killstreet-insta-feed/node_modules/@gradio/client/dist/index.js:96:24) |  ",
+          "attempted_at": "2026-09-16T17:40:16.279Z"
+        },
+        {
+          "space": "zerogpu-aoti/wan2-2-fp8da-aoti-image",
+          "label": "secondary",
+          "endpoint": "/generate_video",
+          "attempt_type": "standard",
+          "duration": 2,
+          "steps": 4,
+          "height": null,
+          "width": null,
+          "status": "failed",
+          "error_type": "generation_failed",
+          "error": "name=Error | message=Could not resolve app config. (received status 503 when fetching the app config) | stack=Error: Could not resolve app config. (received status 503 when fetching the app config) |     at handleConfigResponse (file:///home/runner/work/killstreet-insta-feed/killstreet-insta-feed/node_modules/@gradio/client/dist/index.js:123:8) |     at Client.resolve_config (file:///home/runner/work/killstreet-insta-feed/killstreet-insta-feed/node_modules/@gradio/client/dist/index.js:96:24) |  ",
+          "attempted_at": "2026-09-16T17:42:30.781Z"
+        }
+      ],
+      "hf_error": "name=Error | message=Could not resolve app config. (received status 503 when fetching the app config) | stack=Error: Could not resolve app config. (received status 503 when fetching the app config) |     at handleConfigResponse (file:///home/runner/work/killstreet-insta-feed/killstreet-insta-feed/node_modules/@gradio/client/dist/index.js:123:8) |     at Client.resolve_config (file:///home/runner/work/killstreet-insta-feed/killstreet-insta-feed/node_modules/@gradio/client/dist/index.js:96:24) |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)",
+      "hf_skip_reason": "",
+      "story_status": "fallback_published",
+      "instagram_publish_status": "fallback_published",
+      "github_run_id": "35129576155"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
