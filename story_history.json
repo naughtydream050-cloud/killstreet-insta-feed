@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18051643493562741",
-      "asset_type": "instagram_media",
-      "title": "K.F.B SESSION collaboration Tshirt\"RUDE DOGZ\"",
-      "template": "afternoon_product",
-      "story_id": "17915524356431894",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_31678572646_afternoon_product_18051643493562741.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-08-13T07:39:03.700183Z"
-    },
-    {
       "asset_id": "18065689760554739",
       "asset_type": "instagram_media",
       "title": "KILLSTREET✖︎BUCK UP collaboration T-shirt",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_36029641871_night_cta_17996852940005695.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-09-24T16:47:13.351564Z"
+    },
+    {
+      "asset_id": "18074197661427549",
+      "asset_type": "instagram_media",
+      "title": "Trompe l'oeil Full Print KILLSTREET Signature",
+      "template": "morning_worldview",
+      "story_id": "17917589988450224",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_36093047754_morning_worldview_18074197661427549.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-09-25T04:06:51.035932Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
