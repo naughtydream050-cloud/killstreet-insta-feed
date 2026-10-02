@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18602359075021330",
-      "asset_type": "instagram_media",
-      "title": "9ma 4 KRUMP collaboration T-shirt denim Print Dirty Paint",
-      "template": "morning_worldview",
-      "story_id": "18145022602543858",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_32204735662_morning_worldview_18602359075021330.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-08-19T01:24:05.228285Z"
-    },
-    {
       "asset_id": "18051643493562741",
       "asset_type": "instagram_media",
       "title": "K.F.B SESSION collaboration Tshirt\"RUDE DOGZ\"",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_36863617316_night_cta_18074197661427549.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-10-01T12:43:55.854725Z"
+    },
+    {
+      "asset_id": "18065689760554739",
+      "asset_type": "instagram_media",
+      "title": "KILLSTREET✖︎BUCK UP collaboration T-shirt",
+      "template": "morning_worldview",
+      "story_id": "17870859240641428",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_36965970452_morning_worldview_18065689760554739.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-10-02T04:46:38.814690Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
