@@ -1,0 +1,21 @@
+{
+  "space": "https://hugging-apps-kandinsky-6-lite-distill-5s.hf.space",
+  "api_name": "/generate",
+  "input_image": "reports\\video-ai-runway-test\\138177407_classic_no_talk.jpg",
+  "prompt": "Darkcore luxury fashion video for KILL STREET. Use the provided first frame as the exact starting image. Keep the model and shirt graphic as stable as possible. Very subtle body movement and slow cinematic camera push-in in a dark gallery-like space. Preserve the clothing silhouette, print placement, and readable graphic. No new text, no logo mutation, no fast movement, no spinning.",
+  "token_present": true,
+  "token_logged": false,
+  "started_at": "2026-10-13T08:49:07.802Z",
+  "status": "success",
+  "completed_at": "2026-10-13T08:51:01.164Z",
+  "elapsed_seconds": 113.346,
+  "output_path": "reports\\video-ai-kandinsky-test\\kandinsky-6-lite-distill-5s-classic-no-talk.mp4",
+  "output_url_present": true,
+  "output_bytes": 901647,
+  "raw_result_shape": [
+    "object",
+    "string",
+    "string",
+    "string"
+  ]
+}
