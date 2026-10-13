@@ -32,6 +32,18 @@ const LEGACY_SPACE = process.env.HF_VIDEO_SPACE || "multimodalart/Wan2.1-Fast";
 const LEGACY_SPACE_URL = process.env.HF_VIDEO_SPACE_URL || "https://multimodalart-wan2-1-fast.hf.space";
 const LEGACY_ENDPOINT = process.env.HF_VIDEO_ENDPOINT || "/generate_video";
 
+// Free-only policy: paid/trial-credit video providers are deliberately not wired in.
+// Cloudflare Workers AI, OpenRouter, and Pollinations do not provide a verified, recurring
+// free API quota suitable for this Story workflow, so no paid provider is ever called.
+const PAID_PROVIDER_DISABLED = {
+  cloudflare_status: "not_eligible_free",
+  cloudflare_model: "",
+  cloudflare_error: "paid_api_disabled_by_free_only_policy",
+  openrouter_status: "not_eligible_free",
+  openrouter_model: "",
+  openrouter_error: "paid_api_disabled_by_free_only_policy",
+};
+
 const ROOT = process.cwd();
 const OUT_DIR = path.join(ROOT, "docs", "story", "generated");
 const WORK_DIR = path.join(ROOT, "docs", "story", "generated", "_ai_video_work");
@@ -182,6 +194,13 @@ function updateVideoHistory(payload, fields = {}) {
     posted_at: "",
     source: "hf_video_auto",
     generation_mode: payload.settings?.generation_mode || "unknown",
+    cloudflare_status: payload.settings?.cloudflare_status || "",
+    cloudflare_model: payload.settings?.cloudflare_model || "",
+    cloudflare_error: payload.settings?.cloudflare_error || "",
+    openrouter_status: payload.settings?.openrouter_status || "",
+    openrouter_model: payload.settings?.openrouter_model || "",
+    openrouter_error: payload.settings?.openrouter_error || "",
+    estimated_cost_usd: payload.settings?.estimated_cost_usd ?? 0,
     hf_attempted_at: payload.settings?.hf_attempted_at || "",
     hf_status: payload.settings?.hf_status || "",
     hf_error_type: payload.settings?.hf_error_type || "",
@@ -756,6 +775,10 @@ async function prepare() {
   let hfHeight = HF_SPACE_CONFIGS[0]?.height || 896;
   let hfWidth = HF_SPACE_CONFIGS[0]?.width || 512;
   let hfEndpoint = HF_SPACE_CONFIGS[0]?.endpoint || "/generate_video";
+
+  console.log(
+    "[AI VIDEO] paid_video_providers=disabled free_only_policy=true paid_api_called=false providers=cloudflare,openrouter,pollinations"
+  );
   if (!DRY_RUN) {
     const hfGate = shouldAttemptHf(history);
     if (!hfGate.ok) {
@@ -798,44 +821,46 @@ async function prepare() {
   }
 
   const payload = {
-    skip: false,
-    prepared_at: isoNow(),
-    posted_date_jst: today,
-    product_title: product.product_title,
-    product_page_url: product.product_page_url,
-    product_image_url: product.product_image_url,
-    generated_story_video_path: storyVideo,
-    public_story_video_url: publicVideoUrl,
-    history_file: HISTORY_FILE,
-    github_run_id: GITHUB_RUN_ID,
-    settings: {
-      space: hfSelectedSpace || HF_SPACE_CONFIGS[0]?.space || "",
-      endpoint: hfEndpoint,
-      duration: hfDuration,
-      steps: hfSteps,
-      height: hfHeight,
-      width: hfWidth,
-      output: "1080x1920 story mp4",
-      generation_mode: generationMode,
-      story_status: storyStatus,
-      hf_status: hfStatus,
-      hf_error_type: hfErrorType,
-      hf_selected_space: hfSelectedSpace,
-      hf_attempt_count: hfAttempts.length,
-      hf_attempts: hfAttempts,
-      hf_attempted_at: hfAttemptedAt,
-      hf_error: hfError,
-      hf_skip_reason: hfSkipReason,
-      hf_space_candidates: HF_SPACE_CONFIGS.map((config) => ({
-        label: config.label,
-        space: config.space,
-        endpoint: config.endpoint,
-        args: config.args,
-      })),
-      static_fallback_enabled: VIDEO_FALLBACK_STATIC,
-      hf_min_hours_between_attempts: HF_MIN_HOURS_BETWEEN_ATTEMPTS,
-    },
-  };
+      skip: false,
+      prepared_at: isoNow(),
+      posted_date_jst: today,
+      product_title: product.product_title,
+      product_page_url: product.product_page_url,
+      product_image_url: product.product_image_url,
+      generated_story_video_path: storyVideo,
+      public_story_video_url: publicVideoUrl,
+      history_file: HISTORY_FILE,
+      github_run_id: GITHUB_RUN_ID,
+      settings: {
+        ...PAID_PROVIDER_DISABLED,
+        space: hfSelectedSpace || HF_SPACE_CONFIGS[0]?.space || "",
+        endpoint: hfEndpoint,
+        duration: hfDuration,
+        steps: hfSteps,
+        height: hfHeight,
+        width: hfWidth,
+        output: "1080x1920 story mp4",
+        generation_mode: generationMode,
+        story_status: storyStatus,
+        hf_status: hfStatus,
+        hf_error_type: hfErrorType,
+        hf_selected_space: hfSelectedSpace,
+        hf_attempt_count: hfAttempts.length,
+        hf_attempts: hfAttempts,
+        hf_attempted_at: hfAttemptedAt,
+        hf_error: hfError,
+        hf_skip_reason: hfSkipReason,
+        hf_space_candidates: HF_SPACE_CONFIGS.map((config) => ({
+          label: config.label,
+          space: config.space,
+          endpoint: config.endpoint,
+          args: config.args,
+        })),
+        static_fallback_enabled: VIDEO_FALLBACK_STATIC,
+        hf_min_hours_between_attempts: HF_MIN_HOURS_BETWEEN_ATTEMPTS,
+        estimated_cost_usd: 0,
+      },
+    };
   writeJson(PAYLOAD_FILE, payload);
   if (!DRY_RUN && hfAttemptedAt) {
     updateVideoHistory(payload, {

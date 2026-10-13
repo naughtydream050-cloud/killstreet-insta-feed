@@ -11,6 +11,8 @@ This workflow generates one KILL STREET AI marketing video per day and posts it 
 
 Safety rules:
 
+- It is free-only: it never calls a paid or trial-credit video generation provider. Cloudflare Workers AI, OpenRouter, and Pollinations do not provide a verified, recurring free API quota suitable for this workflow, so they are deliberately not wired in. The payload/history and logs record `cloudflare_status=not_eligible_free`, `openrouter_status=not_eligible_free`, and `*_error=paid_api_disabled_by_free_only_policy`, with `estimated_cost_usd=0`.
+- The only permitted generation routes are existing HF generation (under its 26-hour gate) and the existing static product-image six-second MP4 fallback (`generation_mode` is `hf_video` or `static_product_video_fallback`).
 - It does not post Reels or Feed.
 - It does not use native Instagram link stickers.
 - It does not modify `posted_history.json`.
