@@ -592,15 +592,28 @@ async function generateHfVideo(inputImage, rawVideo, config, settings) {
   await writeFile(rawVideo, Buffer.from(await response.arrayBuffer()));
 }
 
-async function attemptHfGeneration(inputImage, rawVideo) {
+async function attemptHfGeneration(inputImage, rawVideo, allowLegacyCandidates = true) {
   const attempts = [];
   let firstAttemptedAt = "";
   let finalError = "";
   let finalErrorType = "";
 
-  for (const config of HF_SPACE_CONFIGS) {
+  const configsToTry = HF_SPACE_CONFIGS.filter((config) => {
+    if (!allowLegacyCandidates && config.args && config.args.startsWith("wan")) {
+      return false;
+    }
+    return true;
+  });
+
+  for (const config of configsToTry) {
     for (const retry of [false, true]) {
       if (retry) {
+        // Retry capability guard: only attempt a worker retry when the candidate
+        // actually exposes retry settings. Kandinsky has retry:{} (no own keys) and
+        // must make exactly one API request per run; Wan configs carry retry settings.
+        if (!config.retry || Object.keys(config.retry).length === 0) {
+          break;
+        }
         const previous = attempts[attempts.length - 1];
         if (previous?.space !== config.space || previous?.error_type !== "worker_error") {
           break;
@@ -802,40 +815,37 @@ async function prepare() {
     "[AI VIDEO] paid_video_providers=disabled free_only_policy=true paid_api_called=false providers=cloudflare,openrouter,pollinations"
   );
   if (!DRY_RUN) {
-    const hfGate = shouldAttemptHf(history);
-    if (!hfGate.ok) {
-      generationMode = "static_product_video_fallback";
-      hfStatus = "cooldown_skip";
-      hfSkipReason = hfGate.reason;
-      console.log(`[AI VIDEO] hf_skipped=${hfSkipReason}`);
-      await renderFallbackStoryVideo(inputImage, storyVideo, path.join(WORK_DIR, `${baseName}_text`), product.product_title);
-    } else {
-      console.log(`[AI VIDEO] hf_gate=open reason=${hfGate.reason}`);
-      const hfResult = await attemptHfGeneration(inputImage, rawVideo);
-      hfStatus = hfResult.hf_status;
-      hfErrorType = hfResult.hf_error_type;
-      hfError = hfResult.hf_error;
-      hfAttemptedAt = hfResult.hf_attempted_at;
-      hfSelectedSpace = hfResult.hf_selected_space;
-      hfAttempts = hfResult.hf_attempts;
-      hfEndpoint = hfResult.endpoint || hfEndpoint;
-      hfDuration = hfResult.duration || hfDuration;
-      hfSteps = hfResult.steps || hfSteps;
-      hfHeight = hfResult.height || hfHeight;
-      hfWidth = hfResult.width || hfWidth;
+    const legacyGate = shouldAttemptHf(history);
+    console.log(`[AI VIDEO] hf_legacy_gate=legacy_only legacy_reason=${legacyGate.ok ? "open" : "closed"}`);
 
-      if (hfResult.ok) {
-        await renderStoryVideo(rawVideo, storyVideo, path.join(WORK_DIR, `${baseName}_text`), product.product_title, {
-          preserveSpeed: hfResult.hf_selected_space === KANDINSKY_SPACE,
-        });
-      } else {
-        if (!VIDEO_FALLBACK_STATIC) {
-          throw new Error(`HF generation failed without fallback: ${shortText(hfError, 500)}`);
-        }
-        generationMode = "static_product_video_fallback";
-        console.log(`[AI VIDEO] fallback=static_product_video reason=${hfStatus}`);
-        await renderFallbackStoryVideo(inputImage, storyVideo, path.join(WORK_DIR, `${baseName}_text`), product.product_title);
+    // Kandinsky is always attempted (subject to the same-day Story lock applied
+    // elsewhere). The legacy 26h throttle only gates the Wan candidates via the
+    // allowLegacyCandidates flag, never Kandinsky itself.
+    console.log(`[AI VIDEO] hf_gate=open reason=always_attempt_kandinsky allow_legacy=${legacyGate.ok}`);
+    const hfResult = await attemptHfGeneration(inputImage, rawVideo, legacyGate.ok);
+    hfStatus = hfResult.hf_status;
+    hfErrorType = hfResult.hf_error_type;
+    hfError = hfResult.hf_error;
+    hfAttemptedAt = hfResult.hf_attempted_at;
+    hfSelectedSpace = hfResult.hf_selected_space;
+    hfAttempts = hfResult.hf_attempts;
+    hfEndpoint = hfResult.endpoint || hfEndpoint;
+    hfDuration = hfResult.duration || hfDuration;
+    hfSteps = hfResult.steps || hfSteps;
+    hfHeight = hfResult.height || hfHeight;
+    hfWidth = hfResult.width || hfWidth;
+
+    if (hfResult.ok) {
+      await renderStoryVideo(rawVideo, storyVideo, path.join(WORK_DIR, `${baseName}_text`), product.product_title, {
+        preserveSpeed: hfResult.hf_selected_space === KANDINSKY_SPACE,
+      });
+    } else {
+      if (!VIDEO_FALLBACK_STATIC) {
+        throw new Error(`HF generation failed without fallback: ${shortText(hfError, 500)}`);
       }
+      generationMode = "static_product_video_fallback";
+      console.log(`[AI VIDEO] fallback=static_product_video reason=${hfStatus}`);
+      await renderFallbackStoryVideo(inputImage, storyVideo, path.join(WORK_DIR, `${baseName}_text`), product.product_title);
     }
   } else {
     console.log("[AI VIDEO][DRY RUN] generation/render skipped");
