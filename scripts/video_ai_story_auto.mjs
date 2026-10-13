@@ -31,6 +31,9 @@ const PRODUCT_IMAGE_URL = process.env.VIDEO_PRODUCT_IMAGE_URL || "";
 const LEGACY_SPACE = process.env.HF_VIDEO_SPACE || "multimodalart/Wan2.1-Fast";
 const LEGACY_SPACE_URL = process.env.HF_VIDEO_SPACE_URL || "https://multimodalart-wan2-1-fast.hf.space";
 const LEGACY_ENDPOINT = process.env.HF_VIDEO_ENDPOINT || "/generate_video";
+const KANDINSKY_SPACE = process.env.HF_KANDINSKY_SPACE || "hugging-apps/kandinsky-6-lite-distill-5s";
+const KANDINSKY_SPACE_URL = process.env.HF_KANDINSKY_SPACE_URL || "https://hugging-apps-kandinsky-6-lite-distill-5s.hf.space";
+const KANDINSKY_ENDPOINT = process.env.HF_KANDINSKY_ENDPOINT || "/generate";
 
 // Free-only policy: paid/trial-credit video providers are deliberately not wired in.
 // Cloudflare Workers AI, OpenRouter, and Pollinations do not provide a verified, recurring
@@ -86,6 +89,19 @@ function writeJson(file, data) {
 
 function defaultHfSpaceConfigs() {
   return [
+    {
+      id: "kandinsky_6_lite_distill",
+      label: "kandinsky_6_lite",
+      space: KANDINSKY_SPACE,
+      url: KANDINSKY_SPACE_URL,
+      endpoint: KANDINSKY_ENDPOINT,
+      // Verified Space contract: fixed 5s / 24fps / ~528x784 / 10 distilled PiFlow steps,
+      // inputs [prompt, first_frame_image, expand_prompt=false, seed]. The API accepts no
+      // resolution/guidance/steps arguments, so none are configured or sent.
+      args: "kandinsky_standard",
+      duration: 5.0,
+      retry: {},
+    },
     {
       id: "wan21_fast_primary",
       label: "primary",
@@ -529,6 +545,7 @@ function hfAttemptSettings(config, retry = false) {
 }
 
 function buildPredictArgs(config, imageBlob, settings, seed) {
+  if (config.args === "kandinsky_standard") return [PROMPT, imageBlob, false, seed];
   if (config.args === "wan_fast_auto_resize") {
     return [
       imageBlob,
@@ -667,11 +684,16 @@ async function attemptHfGeneration(inputImage, rawVideo) {
   };
 }
 
-async function renderStoryVideo(rawVideo, storyVideo, textDir, productTitle) {
+async function renderStoryVideo(rawVideo, storyVideo, textDir, productTitle, options = {}) {
   const files = await writeOverlayTextFiles(textDir, productTitle);
 
+  // Kandinsky is a real 5s source, so it must not be slowed down; pad it to the 6s Story length.
+  // Wan keeps the original 1.875x time stretch tuned for its ~3.2s output.
+  const sourceFilter = options.preserveSpeed ? "setpts=PTS" : "setpts=1.875*PTS";
+  const padFilter = options.preserveSpeed ? ",tpad=stop_mode=clone:stop_duration=1" : "";
+
   const filter = [
-    "[0:v]setpts=1.875*PTS,fps=30,scale=1080:-2:flags=lanczos,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black[base]",
+    `[0:v]${sourceFilter},fps=30,scale=1080:-2:flags=lanczos,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black${padFilter}[base]`,
     ...overlayFilters(files),
   ].join(";");
 
@@ -803,7 +825,9 @@ async function prepare() {
       hfWidth = hfResult.width || hfWidth;
 
       if (hfResult.ok) {
-        await renderStoryVideo(rawVideo, storyVideo, path.join(WORK_DIR, `${baseName}_text`), product.product_title);
+        await renderStoryVideo(rawVideo, storyVideo, path.join(WORK_DIR, `${baseName}_text`), product.product_title, {
+          preserveSpeed: hfResult.hf_selected_space === KANDINSKY_SPACE,
+        });
       } else {
         if (!VIDEO_FALLBACK_STATIC) {
           throw new Error(`HF generation failed without fallback: ${shortText(hfError, 500)}`);
