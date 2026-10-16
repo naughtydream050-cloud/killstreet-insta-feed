@@ -706,7 +706,7 @@ async function renderStoryVideo(rawVideo, storyVideo, textDir, productTitle, opt
   const padFilter = options.preserveSpeed ? ",tpad=stop_mode=clone:stop_duration=1" : "";
 
   const filter = [
-    `[0:v]${sourceFilter},fps=30,scale=1080:-2:flags=lanczos,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black${padFilter}[base]`,
+    `[0:v]${sourceFilter},fps=30,scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=black${padFilter}[base]`,
     ...overlayFilters(files),
   ].join(";");
 
@@ -836,9 +836,23 @@ async function prepare() {
     hfWidth = hfResult.width || hfWidth;
 
     if (hfResult.ok) {
-      await renderStoryVideo(rawVideo, storyVideo, path.join(WORK_DIR, `${baseName}_text`), product.product_title, {
-        preserveSpeed: hfResult.hf_selected_space === KANDINSKY_SPACE,
-      });
+      try {
+        await renderStoryVideo(rawVideo, storyVideo, path.join(WORK_DIR, `${baseName}_text`), product.product_title, {
+          preserveSpeed: hfResult.hf_selected_space === KANDINSKY_SPACE,
+        });
+      } catch (renderError) {
+        const renderReason = formatError(renderError);
+        console.log(`[AI VIDEO][WARN] render_failed error=${shortText(renderReason, 500)}`);
+        if (!VIDEO_FALLBACK_STATIC) {
+          throw new Error(`Render failed without fallback: ${shortText(renderReason, 500)}`);
+        }
+        generationMode = "static_product_video_fallback";
+        hfErrorType = "render_error";
+        hfSkipReason = "render_failure";
+        hfError = renderReason;
+        console.log(`[AI VIDEO] fallback=static_product_video reason=render_failure`);
+        await renderFallbackStoryVideo(inputImage, storyVideo, path.join(WORK_DIR, `${baseName}_text`), product.product_title);
+      }
     } else {
       if (!VIDEO_FALLBACK_STATIC) {
         throw new Error(`HF generation failed without fallback: ${shortText(hfError, 500)}`);
