@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18074197661427549",
-      "asset_type": "instagram_media",
-      "title": "Trompe l'oeil Full Print KILLSTREET Signature",
-      "template": "afternoon_product",
-      "story_id": "18126182233848357",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_34962861465_afternoon_product_18074197661427549.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-09-15T11:22:38.843358Z"
-    },
-    {
       "asset_id": "17996852940005695",
       "asset_type": "instagram_media",
       "title": "\"KRUMP愛\"COTTON BASIC BUCK T-shirt",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_41275480248_morning_worldview_18074197661427549.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-11-01T05:05:06.824434Z"
+    },
+    {
+      "asset_id": "17996852940005695",
+      "asset_type": "instagram_media",
+      "title": "\"KRUMP愛\"COTTON BASIC BUCK T-shirt",
+      "template": "night_cta",
+      "story_id": "18082694711341528",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_41308556809_night_cta_17996852940005695.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-11-01T12:53:36.626526Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
