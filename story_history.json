@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "17996852940005695",
-      "asset_type": "instagram_media",
-      "title": "\"KRUMP愛\"COTTON BASIC BUCK T-shirt",
-      "template": "night_cta",
-      "story_id": "18166304356473550",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_34995766455_night_cta_17996852940005695.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-09-15T16:34:31.175918Z"
-    },
-    {
       "asset_id": "18602359075021330",
       "asset_type": "instagram_media",
       "title": "9ma 4 KRUMP collaboration T-shirt denim Print Dirty Paint",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_41308556809_night_cta_17996852940005695.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-11-01T12:53:36.626526Z"
+    },
+    {
+      "asset_id": "17969416905198743",
+      "asset_type": "instagram_media",
+      "title": "KILLSTREET — FRACTURED IDENTITY WINDBREAKER",
+      "template": "morning_worldview",
+      "story_id": "18164756788500454",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_41391974705_morning_worldview_17969416905198743.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-11-02T05:06:03.280320Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
