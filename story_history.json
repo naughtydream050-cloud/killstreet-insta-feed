@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18065689760554739",
-      "asset_type": "instagram_media",
-      "title": "KILLSTREET✖︎BUCK UP collaboration T-shirt",
-      "template": "afternoon_product",
-      "story_id": "18100818236021702",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_35088493780_afternoon_product_18065689760554739.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-09-16T11:06:47.671379Z"
-    },
-    {
       "asset_id": "18074197661427549",
       "asset_type": "instagram_media",
       "title": "Trompe l'oeil Full Print KILLSTREET Signature",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_41468210073_night_cta_17950605132285118.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-11-02T15:08:00.908369Z"
+    },
+    {
+      "asset_id": "17969416905198743",
+      "asset_type": "instagram_media",
+      "title": "KILLSTREET — FRACTURED IDENTITY WINDBREAKER",
+      "template": "morning_worldview",
+      "story_id": "18146732320599510",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_41586378089_morning_worldview_17969416905198743.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-11-03T05:52:41.400977Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
