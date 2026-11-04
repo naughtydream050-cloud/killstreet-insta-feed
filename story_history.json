@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "17996852940005695",
-      "asset_type": "instagram_media",
-      "title": "\"KRUMP愛\"COTTON BASIC BUCK T-shirt",
-      "template": "morning_worldview",
-      "story_id": "17905629951333075",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_35180657744_morning_worldview_17996852940005695.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-09-17T04:07:15.003345Z"
-    },
-    {
       "asset_id": "18065689760554739",
       "asset_type": "instagram_media",
       "title": "KILLSTREET✖︎BUCK UP collaboration T-shirt",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_41647953156_night_cta_18074197661427549.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-11-03T13:51:21.121763Z"
+    },
+    {
+      "asset_id": "17950605132285118",
+      "asset_type": "instagram_media",
+      "title": "\"人間不信\" Dirty painted state Long sleeve shirt",
+      "template": "morning_worldview",
+      "story_id": "17912601738308986",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_41779386725_morning_worldview_17950605132285118.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-11-04T05:28:43.634375Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
