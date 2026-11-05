@@ -1,16 +1,6 @@
 {
   "stories": [
     {
-      "asset_id": "18074197661427549",
-      "asset_type": "instagram_media",
-      "title": "Trompe l'oeil Full Print KILLSTREET Signature",
-      "template": "night_cta",
-      "story_id": "17901937275593198",
-      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_35247188310_night_cta_18074197661427549.jpg",
-      "shop_url": "https://killstreet2.base.shop/",
-      "posted_at": "2026-09-17T16:33:36.598723Z"
-    },
-    {
       "asset_id": "18602359075021330",
       "asset_type": "instagram_media",
       "title": "9ma 4 KRUMP collaboration T-shirt denim Print Dirty Paint",
@@ -1199,6 +1189,16 @@
       "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_41842890737_night_cta_17969416905198743.jpg",
       "shop_url": "https://killstreet2.base.shop/",
       "posted_at": "2026-11-04T13:58:45.814804Z"
+    },
+    {
+      "asset_id": "17950605132285118",
+      "asset_type": "instagram_media",
+      "title": "\"人間不信\" Dirty painted state Long sleeve shirt",
+      "template": "morning_worldview",
+      "story_id": "18126043981906667",
+      "image_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/story_41976203565_morning_worldview_17950605132285118.jpg",
+      "shop_url": "https://killstreet2.base.shop/",
+      "posted_at": "2026-11-05T05:48:15.835961Z"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. Story history only. Do not edit manually.",
