@@ -1,20 +1,6 @@
 {
   "videos": [
     {
-      "story_id": "17933587470275925",
-      "container_id": "18074031893476636",
-      "product_title": "VINTAGE-Processed \"ワルモノ\" T-shirt",
-      "product_page_url": "https://killstreet2.base.shop/items/137814369",
-      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-06-08_27096281956.mp4",
-      "posted_date_jst": "2026-06-08",
-      "posted_at": "2026-06-07T15:09:33.623Z",
-      "source": "hf_video_auto",
-      "generation_mode": "static_product_video_fallback",
-      "hf_attempted_at": "2026-06-07T15:08:42.545Z",
-      "hf_error": "You have exceeded your ZeroGPU quota (150s requested vs. 29s left). Try again in 0:15:43. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens",
-      "hf_skip_reason": ""
-    },
-    {
       "story_id": "17971711776060641",
       "container_id": "18074189858476636",
       "product_title": "VINTAGE Dirty Paint Processed \"ワルモノ\" T-Shirt",
@@ -4264,6 +4250,50 @@
       "story_status": "hf_video_published",
       "instagram_publish_status": "hf_video_published",
       "github_run_id": "43502603437"
+    },
+    {
+      "story_id": "18116636339175681",
+      "container_id": "18097753208476636",
+      "product_title": "VINTAGE Dirty Paint Processed \"ワルモノ\" T-Shirt",
+      "product_page_url": "https://killstreet2.base.shop/items/137849083",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-11-15_43628474350.mp4",
+      "prepared_date_jst": "2026-11-15",
+      "posted_date_jst": "2026-11-15",
+      "posted_at": "2026-11-14T18:49:28.776Z",
+      "source": "hf_video_auto",
+      "generation_mode": "hf_video",
+      "cloudflare_status": "not_eligible_free",
+      "cloudflare_model": "",
+      "cloudflare_error": "paid_api_disabled_by_free_only_policy",
+      "openrouter_status": "not_eligible_free",
+      "openrouter_model": "",
+      "openrouter_error": "paid_api_disabled_by_free_only_policy",
+      "estimated_cost_usd": 0,
+      "hf_attempted_at": "2026-11-14T18:47:12.556Z",
+      "hf_status": "generation_success",
+      "hf_error_type": "",
+      "hf_selected_space": "hugging-apps/kandinsky-6-lite-distill-5s",
+      "hf_attempt_count": 1,
+      "hf_attempts": [
+        {
+          "space": "hugging-apps/kandinsky-6-lite-distill-5s",
+          "label": "kandinsky_6_lite",
+          "endpoint": "/generate",
+          "attempt_type": "standard",
+          "duration": 5,
+          "height": null,
+          "width": null,
+          "status": "success",
+          "error_type": "",
+          "error": "",
+          "attempted_at": "2026-11-14T18:47:12.556Z"
+        }
+      ],
+      "hf_error": "",
+      "hf_skip_reason": "",
+      "story_status": "hf_video_published",
+      "instagram_publish_status": "hf_video_published",
+      "github_run_id": "43628474350"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
