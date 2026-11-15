@@ -1,20 +1,6 @@
 {
   "videos": [
     {
-      "story_id": "17971711776060641",
-      "container_id": "18074189858476636",
-      "product_title": "VINTAGE Dirty Paint Processed \"ワルモノ\" T-Shirt",
-      "product_page_url": "https://killstreet2.base.shop/items/137849083",
-      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-06-09_27153395057.mp4",
-      "posted_date_jst": "2026-06-09",
-      "posted_at": "2026-06-08T16:57:07.004Z",
-      "source": "hf_video_auto",
-      "generation_mode": "static_product_video_fallback",
-      "hf_attempted_at": "",
-      "hf_error": "",
-      "hf_skip_reason": "hf_cooldown elapsed_hours=25.79 min_hours=26"
-    },
-    {
       "story_id": "18116450788848841",
       "container_id": "18074330048476636",
       "product_title": "\"生-Raw-\" Print Running Script Processed T-Shirt",
@@ -4294,6 +4280,50 @@
       "story_status": "hf_video_published",
       "instagram_publish_status": "hf_video_published",
       "github_run_id": "43628474350"
+    },
+    {
+      "story_id": "17940129738401979",
+      "container_id": "18097928717476636",
+      "product_title": "KILLSTREET — FRACTURED IDENTITY WINDBREAKER",
+      "product_page_url": "https://killstreet2.base.shop/items/164435756",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-11-16_43752302147.mp4",
+      "prepared_date_jst": "2026-11-16",
+      "posted_date_jst": "2026-11-16",
+      "posted_at": "2026-11-15T19:27:48.983Z",
+      "source": "hf_video_auto",
+      "generation_mode": "hf_video",
+      "cloudflare_status": "not_eligible_free",
+      "cloudflare_model": "",
+      "cloudflare_error": "paid_api_disabled_by_free_only_policy",
+      "openrouter_status": "not_eligible_free",
+      "openrouter_model": "",
+      "openrouter_error": "paid_api_disabled_by_free_only_policy",
+      "estimated_cost_usd": 0,
+      "hf_attempted_at": "2026-11-15T19:25:36.177Z",
+      "hf_status": "generation_success",
+      "hf_error_type": "",
+      "hf_selected_space": "hugging-apps/kandinsky-6-lite-distill-5s",
+      "hf_attempt_count": 1,
+      "hf_attempts": [
+        {
+          "space": "hugging-apps/kandinsky-6-lite-distill-5s",
+          "label": "kandinsky_6_lite",
+          "endpoint": "/generate",
+          "attempt_type": "standard",
+          "duration": 5,
+          "height": null,
+          "width": null,
+          "status": "success",
+          "error_type": "",
+          "error": "",
+          "attempted_at": "2026-11-15T19:25:36.177Z"
+        }
+      ],
+      "hf_error": "",
+      "hf_skip_reason": "",
+      "story_status": "hf_video_published",
+      "instagram_publish_status": "hf_video_published",
+      "github_run_id": "43752302147"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
