@@ -1,23 +1,6 @@
 {
   "videos": [
     {
-      "story_id": "17930230368338392",
-      "container_id": "18075791255476636",
-      "product_title": "BUCK PANTS KRUMP TERMINOLOGY PRINT Dirty-Processed Paint",
-      "product_page_url": "https://killstreet2.base.shop/items/139697607",
-      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-06-20_27836836160.mp4",
-      "prepared_date_jst": "2026-06-20",
-      "posted_date_jst": "2026-06-20",
-      "posted_at": "2026-06-19T16:20:58.316Z",
-      "source": "hf_video_auto",
-      "generation_mode": "hf_video",
-      "hf_attempted_at": "2026-06-19T16:17:47.783Z",
-      "hf_error": "",
-      "hf_skip_reason": "",
-      "instagram_publish_status": "published",
-      "github_run_id": "27836836160"
-    },
-    {
       "story_id": "17990601254812258",
       "container_id": "18076093442476636",
       "product_title": "Trompe l&#039;oeil Full Print KILLSTREET Signature",
@@ -4492,6 +4475,50 @@
       "story_status": "hf_video_published",
       "instagram_publish_status": "hf_video_published",
       "github_run_id": "44944857392"
+    },
+    {
+      "story_id": "17914006173312128",
+      "container_id": "18098861246476636",
+      "product_title": "Full Design KRUMP Terminology BUCK T-shirt",
+      "product_page_url": "https://killstreet2.base.shop/items/139620541",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-11-23_45066294363.mp4",
+      "prepared_date_jst": "2026-11-23",
+      "posted_date_jst": "2026-11-23",
+      "posted_at": "2026-11-22T20:27:46.961Z",
+      "source": "hf_video_auto",
+      "generation_mode": "hf_video",
+      "cloudflare_status": "not_eligible_free",
+      "cloudflare_model": "",
+      "cloudflare_error": "paid_api_disabled_by_free_only_policy",
+      "openrouter_status": "not_eligible_free",
+      "openrouter_model": "",
+      "openrouter_error": "paid_api_disabled_by_free_only_policy",
+      "estimated_cost_usd": 0,
+      "hf_attempted_at": "2026-11-22T20:25:18.200Z",
+      "hf_status": "generation_success",
+      "hf_error_type": "",
+      "hf_selected_space": "hugging-apps/kandinsky-6-lite-distill-5s",
+      "hf_attempt_count": 1,
+      "hf_attempts": [
+        {
+          "space": "hugging-apps/kandinsky-6-lite-distill-5s",
+          "label": "kandinsky_6_lite",
+          "endpoint": "/generate",
+          "attempt_type": "standard",
+          "duration": 5,
+          "height": null,
+          "width": null,
+          "status": "success",
+          "error_type": "",
+          "error": "",
+          "attempted_at": "2026-11-22T20:25:18.200Z"
+        }
+      ],
+      "hf_error": "",
+      "hf_skip_reason": "",
+      "story_status": "hf_video_published",
+      "instagram_publish_status": "hf_video_published",
+      "github_run_id": "45066294363"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
