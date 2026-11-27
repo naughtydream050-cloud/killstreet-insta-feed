@@ -1,23 +1,6 @@
 {
   "videos": [
     {
-      "story_id": "18185979103387598",
-      "container_id": "18077168861476636",
-      "product_title": "Classic \"喋りすぎ NO TALK\" Buck T-Shirt",
-      "product_page_url": "https://killstreet2.base.shop/items/138177407",
-      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-06-29_28326262479.mp4",
-      "prepared_date_jst": "2026-06-29",
-      "posted_date_jst": "2026-06-29",
-      "posted_at": "2026-06-28T15:04:01.624Z",
-      "source": "hf_video_auto",
-      "generation_mode": "hf_video",
-      "hf_attempted_at": "2026-06-28T15:01:21.282Z",
-      "hf_error": "",
-      "hf_skip_reason": "",
-      "instagram_publish_status": "published",
-      "github_run_id": "28326262479"
-    },
-    {
       "story_id": "18015081887908726",
       "container_id": "18077502620476636",
       "product_title": "VINTAGE-Processed \"ワルモノ\" T-shirt",
@@ -4669,6 +4652,50 @@
       "story_status": "hf_video_published",
       "instagram_publish_status": "hf_video_published",
       "github_run_id": "45905006191"
+    },
+    {
+      "story_id": "17955353853048909",
+      "container_id": "18099540848476636",
+      "product_title": "\"どうせイベント前しかセッション来ねぇじゃん\"Buck Print T-shirt",
+      "product_page_url": "https://killstreet2.base.shop/items/141332459",
+      "video_url": "https://naughtydream050-cloud.github.io/killstreet-insta-feed/story/generated/killstreet_ai_video_story_2026-11-28_46075007663.mp4",
+      "prepared_date_jst": "2026-11-28",
+      "posted_date_jst": "2026-11-28",
+      "posted_at": "2026-11-27T22:13:17.915Z",
+      "source": "hf_video_auto",
+      "generation_mode": "static_product_video_fallback",
+      "cloudflare_status": "not_eligible_free",
+      "cloudflare_model": "",
+      "cloudflare_error": "paid_api_disabled_by_free_only_policy",
+      "openrouter_status": "not_eligible_free",
+      "openrouter_model": "",
+      "openrouter_error": "paid_api_disabled_by_free_only_policy",
+      "estimated_cost_usd": 0,
+      "hf_attempted_at": "2026-11-27T22:11:12.618Z",
+      "hf_status": "worker_error",
+      "hf_error_type": "worker_error",
+      "hf_selected_space": "",
+      "hf_attempt_count": 1,
+      "hf_attempts": [
+        {
+          "space": "hugging-apps/kandinsky-6-lite-distill-5s",
+          "label": "kandinsky_6_lite",
+          "endpoint": "/generate",
+          "attempt_type": "standard",
+          "duration": 5,
+          "height": null,
+          "width": null,
+          "status": "failed",
+          "error_type": "worker_error",
+          "error": "name=Error | message=RuntimeError | stack=Error: RuntimeError |     at Client.predict (file:///home/runner/work/killstreet-insta-feed/killstreet-insta-feed/node_modules/@gradio/client/dist/index.js:1247:19) |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) |     at async generateHfVideo (file:///home/runner/work/killstreet-insta-feed/killstreet-insta-feed/scripts/video_ai_story_auto.mjs:580:18) | props={\"type\":\"status\",\"endpoint\":\"/generate\",\"fn_index\":0,\"time\":",
+          "attempted_at": "2026-11-27T22:11:12.618Z"
+        }
+      ],
+      "hf_error": "name=Error | message=RuntimeError | stack=Error: RuntimeError |     at Client.predict (file:///home/runner/work/killstreet-insta-feed/killstreet-insta-feed/node_modules/@gradio/client/dist/index.js:1247:19) |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) |     at async generateHfVideo (file:///home/runner/work/killstreet-insta-feed/killstreet-insta-feed/scripts/video_ai_story_auto.mjs:580:18) | props={\"type\":\"status\",\"endpoint\":\"/generate\",\"fn_index\":0,\"time\":\"2026-11-27T22:12:26.020Z\",\"queue\":true,\"title\":\"ZeroGPU worker error\",\"visible\":true,\"duration\":10,\"stage\":\"error\",\"success\":false}",
+      "hf_skip_reason": "",
+      "story_status": "fallback_published",
+      "instagram_publish_status": "fallback_published",
+      "github_run_id": "46075007663"
     }
   ],
   "_comment": "Automatically maintained by GitHub Actions. AI video story posting history only.",
